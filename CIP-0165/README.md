@@ -170,13 +170,14 @@ Updating of the file in-place is unsafe so instead we store list of updated.
 All updates are written in the following way:
 
 - if an entry has a natural key and we want to update data we can store a new value;
-- if we want to remove a value with natural key we should write a special tombstone entry, see namespaces;
+- if we want to remove a value with natural key we should write a special tombstone entry;
 - if a value has no natural key we must first delete old value and then insert a new one.
 
 **Structure:**
 
 - `slot_no:` `u64` — slot number where changes were introduced
-- `changes:` `CBOR` array of the entries
+- `namespace:` `bstr` — namespace name
+- `changes:` `CBOR` — array of the entries
 - `footer:` `{entries_count, chunk_hash}`
 
 **Policy:**
@@ -262,7 +263,6 @@ Each logical table/type is a namespace identified by a canonical string (e.g., `
 | drep/v0      | DRep state                      |
 | gov/v0       | Governance action state         |
 | hdr/v0       | Header state (e.g. nonces)      |
-| tombstone/v0 | Marker of the removed entry     |
 
 New namespaces may and will be introduced in the future. With new eras and features, new types of the data will be introduced and stored. In order to define what data is stored in the SCLS file, tools fill the `HDR` record and define namespaces. The order of the namespaces does not change the signatures and other integrity data.
 
