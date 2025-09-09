@@ -18,6 +18,7 @@ hdr = {
 
 ; ----- Entry -----
 entry = {
+  size: uint .size 4        ; size of entry
   key: bstr,                ; key of the data, basically any cbor
   value: bstr               ; value of the data, basically any cbor
 }
@@ -49,8 +50,8 @@ delta = {
 
 change_entry = tombstone_entry // delta_value_entry
 
-tombstone_entry = (0, ? key: bstr, ? value: bytes )
-delta_value_entry = (1, ?key: bstr, value: bstr)
+tombstone_entry = (0, key: bstr )
+delta_value_entry = (1, key: bstr, ?value: bstr)
 
 ; ----- MANIFEST -----
 manifest = {
