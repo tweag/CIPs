@@ -81,7 +81,7 @@ by an external CDDL schema.
 <a name='type-scls_file-rec_manifest'></a>
 <h2>Type: RecManifest</h2>
 
-<p>Manifest — is a trailer in the file that describes information of about the file contents.</p>
+<p>Manifest — is a trailer in the file that describes information of about the file contents</p>
 <table class="table">
 <tr><th>Offset</th><th>Size</th><th>ID</th><th>Type</th><th>Note</th></tr>
 <tr>
@@ -241,18 +241,18 @@ by an external CDDL schema.
 <td>4</td>
 <td>...</td>
 <td>version</td>
-<td>u2be</td>
-<td>Version of the file format.</td>
+<td>u4be</td>
+<td>Version of the file format</td>
 </tr>
 <tr>
-<td>6</td>
+<td>8</td>
 <td>...</td>
 <td>network_id</td>
 <td>u1→NetworkId</td>
-<td>Description of the network.</td>
+<td>Description of the network</td>
 </tr>
 <tr>
-<td>7</td>
+<td>9</td>
 <td>...</td>
 <td>slot_no</td>
 <td>u8be</td>
@@ -269,21 +269,21 @@ by an external CDDL schema.
 <td>...</td>
 <td>size</td>
 <td>u4be</td>
-<td>Size of the record, including size and record type.</td>
+<td>Size of the record, including size and record type</td>
 </tr>
 <tr>
 <td>4</td>
 <td>...</td>
 <td>record_type</td>
 <td>u1</td>
-<td>Type of the record.</td>
+<td>Type of the record</td>
 </tr>
 <tr>
 <td>5</td>
 <td>...</td>
 <td>record_data</td>
 <td>SwitchType(Name(identifier(record_type)),Map(IntNum(0) -> UserTypeInstream(List(rec_header),None,List()), IntNum(1) -> UserTypeInstream(List(rec_manifest),None,List()), IntNum(16) -> UserTypeInstream(List(rec_chunk),None,List())),true)</td>
-<td>Record payload.</td>
+<td>Record payload</td>
 </tr>
 </table>
 <a name='type-scls_file-namespace_info'></a>

@@ -21,12 +21,12 @@ types:
     seq:
       - id: size
         type: u4
-        doc: Size of the record, including size and record type.
+        doc: Size of the record, including size and record type
       - id: record_type
         type: u1
-        doc: Type of the record.
+        doc: Type of the record
       - id: record_data
-        doc: Record payload.
+        doc: Record payload
         type:
           switch-on: record_type
           cases:
@@ -40,17 +40,17 @@ types:
         contents: CDDL
         doc: Magic bytes "CDDL"
       - id: version
-        type: u2
-        doc: Version of the file format.
+        type: u4
+        doc: Version of the file format
       - id: network_id
         type: u1
         enum: network_id
-        doc: Description of the network.
+        doc: Description of the network
       - id: slot_no
         type: u8
         doc: Description of slot.
   rec_manifest:
-    doc: Manifest — is a trailer in the file that describes information of about the file contents.
+    doc: Manifest — is a trailer in the file that describes information of about the file contents
     seq:
       - id: total_entries
         type: u8
