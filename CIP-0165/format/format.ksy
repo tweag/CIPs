@@ -82,7 +82,7 @@ types:
         type: u8
         doc: Sequential number of the chunk
       - id: format
-        type: u8
+        type: u1
         enum: chunk_format
       - id: ns
         type: tstr
