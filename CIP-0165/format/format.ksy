@@ -24,7 +24,7 @@ types:
       - id: payload
         type: scls_record_data
         doc: payload of the record
-        size: len_payload - 4
+        size: len_payload
   scls_record_data:
     seq:
       - id: record_type
@@ -32,7 +32,7 @@ types:
         doc: Type of the record
       - id: record_data
         doc: Record payload
-        # size: _parent.len_payload - 5
+        # size: _parent.len_payload - 1
         size-eos: true
         type:
           switch-on: record_type
@@ -112,7 +112,7 @@ types:
     instances:
       # size of record_data for this scls_record (total - size:u4 - record_type:u1)
       rec_payload_size:
-        value: _parent._parent.len_payload - 5
+        value: _parent._parent.len_payload - 1
       ns_size:
         value: 4 + len_ns
       len_data:
