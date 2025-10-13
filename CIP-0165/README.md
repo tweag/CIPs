@@ -124,7 +124,7 @@ For the additional record types (all except `HDR, CHUNK, MANIFEST`) it's possibl
 DataEntry is a blob of a key-valued data. The structure of the `DataEntry` is the following:
 
 - `size` : `u32` - size of the data
-- `key` : `fixed size` - key is a fixed size blob there size depends on the namespace
+- `key` : `fixed size` - key is a fixed size blob where size depends on the namespace
 - `value` : `bstr` — cbor data entry
 
 While the format requires each entry to have a key it's still possible to support hierarchical structures, either by normalizing them
