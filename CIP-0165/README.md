@@ -127,10 +127,10 @@ DataEntry is a blob of a key-valued data. The structure of the `DataEntry` is th
 - `key` : `fixed size` - key is a fixed size blob where size depends on the namespace
 - `value` : `bstr` — cbor data entry
 
-While the format requires each entry to have a key it's still possible to support hierarchical structures, either by normalizing them
-and keep a path or hash as a key, or introduce an artificial key and keep entire hierarchy in a single key. The choice depends on each
-namespace, if there are ways to express and support updating of the part of the tree it worth normalizing a tree. If the data is kept
-and updated as a whole single artificial key can be used.
+While the format requires each entry to have a key, it's still possible to support hierarchical structures, either by normalizing them
+and keeping a path or hash as a key or by introducing an artificial key and keeping the entire hierarchy in a single key. The choice depends on each
+namespace. If there are ways to express and support updating of a part of the tree, it is worth normalizing the tree. If the data is kept
+and updated as a whole, a single artificial key can be used.
 
 **Policy:**
 
