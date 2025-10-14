@@ -110,18 +110,20 @@ types:
         type: digest
         doc: blake28 hash of the entries in the block
     instances:
-      # size of record_data for this scls_record (total - size:u4 - record_type:u1)
+      # size of record_data for this scls_record (total - record_type:u1)
       rec_payload_size:
         value: _parent._parent.len_payload - 1
       ns_size:
         value: 4 + len_ns
       len_data:
         value: rec_payload_size - (8 + 1 + ns_size + 4 + 28)
+        doc: seqno=8, format=1, entries_count=4, digest=28.
       len_key:
         value: |
           (ns == "utxo")  ? 32 :
-          (ns == "stake") ? 28 :
-          (ns == "pool")  ? 28 :
+          # TODO: uncomment when defined
+          # (ns == "stake") ? 28 :
+          # (ns == "pool")  ? 28 :
           0
   entries_block:
     params:
@@ -137,7 +139,7 @@ types:
         type: u2
     seq:
       - id: len_body
-        type: u4                        # size of this entry INCLUDING this u4
+        type: u4
       - id: body
         type: entry_body(len_key)
         size: len_body
