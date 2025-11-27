@@ -1,0 +1,26 @@
+; This file was auto-generated from huddle. Please do not modify it directly!
+
+;  Values for the blocks.
+; 
+;  Key definition:
+; 
+;  ```
+;  meta:
+;    endian: be
+; 
+;  seq:
+;    - id: key
+;      type: blocks
+; 
+;  types:
+;    block:
+;      seq:
+;        - id: keyhash_stakepool
+;          doc: keyhash of the stake pool
+;          size: 28
+;        - id: epoch
+;          doc: epoch
+;          type: u8
+;  ```
+record_entry = int
+
