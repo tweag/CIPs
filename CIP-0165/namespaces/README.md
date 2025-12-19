@@ -4,16 +4,17 @@ This is directory of the supported namespaces.
 
 Each namespace defines a non-intersecting slices of the data.
 
-| Shortname            | Content                         | Key size |
-| -------------------- | ------------------------------- | -------- |
-| blocks/v0            | Blocks created                  | 36 |
-| gov/committee/v0     | Governance action state         | 8  |
-| gov/constitution/v0  | Constitution                    | 8  |
-| gov/pparams/v0       | Protocol parameters             | 4  |
-| gov/proposals/v0     | Update proposals                | 34 |
-| pool_stake/v0        | Stake delegation                | 28 |
-| pots/v0              | Accounting pots (reserves etc.) | 8 |
-| snapshots/v0         | snapshots                       | 32 |
-| utxo/v0              | UTXOs                           | 34 |
+| Shortname            | Content                         | Key size | Key description |
+| -------------------- | ------------------------------- | -------- | --------------- |
+| blocks/v0            | Blocks created                  | 36       | keyhash of the stake pool |
+| gov/committee/v0     | Governance action state         | 8        | epoch |
+| gov/constitution/v0  | Constitution                    | 8        | epoch |
+| gov/pparams/v0       | Protocol parameters             | 4        | current, previous, or future |
+| gov/proposals/v0     | Update proposals                | 34       | address of the proposal in transactions |
+| pool_stake/v0        | Stake delegation                | 28       | stake pool keyhash |
+| nonce/v0             | Nonces                          | 1        | zero key |
+| pots/v0              | Accounting pots (reserves etc.) | 8        | epoch |
+| snapshots/v0         | snapshots                       | 32       | key type, stage, value type (see docs) |
+| utxo/v0              | UTXOs                           | 34       | utxo address in the transaction |
 
-Key specifications are describe in cddl specification comments.
+Key specifications are described in cddl specification comments.

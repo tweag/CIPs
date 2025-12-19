@@ -1,15 +1,15 @@
 ; This file was auto-generated from huddle. Please do not modify it directly!
 
 ;  The key for the namespace
-; 
+;
 ;  ```
 ;  meta:
 ;    endian: be
-; 
+;
 ;  seq:
 ;    - id: key
 ;      type: gov_committee
-; 
+;
 ;  types:
 ;    gov_committee:
 ;      seq:
@@ -42,7 +42,7 @@ script_hash = hash28
 ;  1 - resignation
 committee_authorization = [0, credential// 1, anchor/ nil]
 
-; 
+;
 ;  Signed url
 anchor = [anchor_url : url, anchor_data_hash : bytes]
 

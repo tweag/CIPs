@@ -1,15 +1,15 @@
 ; This file was auto-generated from huddle. Please do not modify it directly!
 
-;  Constinution record entry
-; 
+;  Constitution record entry
+;
 ;  ```
 ;  meta:
 ;    endian: be
-; 
+;
 ;  seq:
 ;    - id: key
 ;      type: gov_constitution
-; 
+;
 ;  gov_constitution:
 ;    seq:
 ;      - id: epoch
@@ -21,7 +21,7 @@ record_entry = constitution
 ;  address of the constition
 constitution = [anchor, script_hash/ nil]
 
-; 
+;
 ;  Signed url
 anchor = [anchor_url : url, anchor_data_hash : bytes]
 
