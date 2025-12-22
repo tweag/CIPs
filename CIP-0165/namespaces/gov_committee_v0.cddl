@@ -1,4 +1,5 @@
-; This file was auto-generated from huddle. Please do not modify it directly!
+; This file was auto-generated from huddle.
+; Source: https://github.com/tweag/cardano-cls/blob/main/scls-cardano/cddl-src/Cardano/SCLS/Namespace/GovCommittee.hs
 
 ;  The key for the namespace
 ;

@@ -62,7 +62,7 @@ Unsupported record types are skipped; core data remains accessible.
 | 0x10 | CHUNK    | Ordered entries with per-chunk footer + hash                                  |
 | 0x11 | DELTA    | Incremental updates overlay (reserved for future)                             |
 | 0x20 | BLOOM    | Per-chunk Bloom filter (reserved for future)                                  |
-| 0x21 | INDEX    | Optional key→offset or value-hash indexes                                     |
+| 0x21 | INDEX    | Optional key→offset or value-hash indexes (reserved for future)               |
 | 0x30 | DIR      | Directory footer with offsets to metadata/index regions (reserved for future) |
 | 0x31 | META     | Opaque metadata entries (e.g., signatures, notes)                             |
 
