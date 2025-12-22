@@ -169,7 +169,7 @@ When calculating and verifying hashes, it's build over the uncompressed data.
 
 #### DELTA Record
 
-Index record is reserved for the future use, in case if search in the file will be required by the downstream, most notably node that wants to generate the file incremetally.
+Delta records are reserved for future use, where the node wishes to incrementally update an existing CLS file rather than writing a new one.
 
 **Purpose:** Delta records are used to build iterative updates, when base format is created and we want to store additional transactions in a fast way. Delta records are designed to be compatible with UTxO-HD, LSM-Tree or other storage types where it's possible to stream list of updates.
 
