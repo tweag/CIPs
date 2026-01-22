@@ -181,7 +181,6 @@ All updates are written in the following way:
 
 **Structure:**
 
-- `slot_no:` `u64` — slot number where changes were introduced
 - `namespace:` `bstr` — namespace name
 - `changes:` `CBOR` — array of the entries, either tombstone entry or value entry
 - `footer:` `{entries_count, chunk_hash}`
