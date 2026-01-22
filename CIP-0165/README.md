@@ -100,8 +100,6 @@ For the additional record types (all except `HDR, CHUNK, MANIFEST`) it's possibl
 
 - `magic` : `b"SCLS"`
 - `version` : `u16` (start with `1`)
-- `network_id` : `u8`  (`0` — mainnet, `1` — testnet)
-- `slot_no` : `u64` identifier of the blockchain point (hash/slot).
 
 **Policy:**
 
@@ -158,6 +156,7 @@ When calculating and verifying hashes, its built over the uncompressed data.
 
 **Structure:**
 
+- `slot_no` : `u64` identifier of the blockchain point (slot number).
 - `total_entries`: `u64` — number of data entries in the file (integrity purpose only)
 - `total_chunks`: `u64` — number of chunks in the file (integrity purpose only)
 - `root_hash`: **Merkle root** of all `entry_e` in the chosen order, see verification for details
@@ -193,6 +192,8 @@ All updates are written in the following way:
 - reader should verify hash before relying on data;
 - dead entries are marked by the special tombstone entry;
 - there must be only one element for the given key in the delta record.
+
+Each set of DELTA records are followed by the MANIFEST slot, that keeps the information about the current slot and state.
 
 #### BLOOM Record
 
