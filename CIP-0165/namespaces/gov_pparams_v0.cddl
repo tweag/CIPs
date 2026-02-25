@@ -60,6 +60,7 @@ gov_pparams_out =
   , 9  : nonnegative_interval   ; a0: pool pledge influence factor
   , 10 : unit_interval          ; rho: monetary expansion rate
   , 11 : unit_interval          ; tau: treasury expansion
+  , 14 : protocol_version       ; protocol_version: protocol version
   , 16 : coin                   ; min_pool_cost: minimum pool cost
   , 17 : coin
                             ; ada_per_utxo_byte: Cost in ada per 1 byte of UTxO storage instead of _coinsPerUTxOWord
