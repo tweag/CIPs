@@ -33,7 +33,7 @@ proposal =
   , expires_after      : epoch_no
   , committee_votes    : {* committee_cold_credential => vote}
   , stake_pool_votes   : {* pool_keyhash => vote}
-  , proposal_procedure : proposal_procedure
+  , proposal_procedure : bytes .cbor proposal_procedure 
   }
 
 
