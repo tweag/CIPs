@@ -98,7 +98,6 @@ gov_action =
   , purpose      : gov_action_id/ nil
   , constitution : constitution
   // 6
-  , nil
   ]
 
 
