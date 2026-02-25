@@ -36,7 +36,6 @@ proposal =
   , proposal_procedure : bytes .cbor proposal_procedure 
   }
 
-
 credential = [0, addr_keyhash// 1, script_hash]
 
 addr_keyhash = hash28
@@ -61,12 +60,12 @@ committee_cold_credential = credential
 
 pool_keyhash = hash28
 
-proposal_procedure =
-  { anchor         : anchor
-  , deposit        : coin
-  , gov_action     : gov_action
+proposal_procedure = 
+  [ deposit        : coin          
   , return_address : reward_account
-  }
+  , gov_action     : gov_action    
+  , anchor         : anchor        
+  ]
 
 
 ;
