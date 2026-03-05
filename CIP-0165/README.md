@@ -122,7 +122,7 @@ For the additional record types (all except `HDR, CHUNK, MANIFEST`) it's possibl
 `REC_HDR` (once at start of file)
 
 - `magic` : `b"SCLS"`
-- `version` : `u16` (start with `1`)
+- `version` : `u32` (start with `1`)
 
 **Policy:**
 
