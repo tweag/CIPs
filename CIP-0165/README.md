@@ -191,8 +191,11 @@ When calculating and verifying hashes, its built over the uncompressed data.
   - `digest`: `Digest` - Merkle root of all `entry_e` in the namespace
 - `prev_manifest`: `u64` — offset of the previous manifest (used with delta files), zero if there is no previous manifest entry
 - `summary`: `{ created_at, tool, comment? }`
+- `offset`: `u32` — offset to the beginning of the MANIFEST record
 
 `Digest` is defined as a fixed-size 224-bit (28-byte) Blake2b hash.
+
+Note that the offset should always be equal to the record length. This has the effect of bookending MANIFEST records with the same 4 bytes.
 
 **Policy:** used to verify all the chunks.
 
