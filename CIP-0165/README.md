@@ -279,9 +279,25 @@ All updates are written in the following way:
 
 **Structure:**
 
-- `namespace:` `bstr` — namespace name
-- `changes:` `CBOR` — array of the entries, either tombstone entry or value entry
-- `footer:` `{entries_count, chunk_hash}`
+```text
+┌──────────────────┬────────────────────────┬──────────────┐
+│ record_size      │ u32                    │              │
+├──────────────────┼────────────────────────┼──────────────┤
+│ record_type      │ u8                     │ 0x11         │
+│ namespace_len    │ u32                    │              │
+│ namespace        │ u8[namespace_len]      │              │
+│ changes          │ CBOR array             │              │
+├── footer ────────┼────────────────────────┼──────────────┤
+│ entries_count    │ u32                    │              │
+│ chunk_hash       │ u8[28]                 │              │
+└──────────────────┴────────────────────────┴──────────────┘
+```
+
+- `namespace_len` : `u32` — byte length of the namespace string
+- `namespace` : `u8[namespace_len]` — UTF-8 encoded namespace name
+- `changes` : CBOR array of entries, either tombstone or value entries
+- `entries_count` : `u32` — number of entries (footer)
+- `chunk_hash` : `u8[28]` — Blake2b-224 hash (footer)
 
 **Policy:**
 
@@ -300,10 +316,22 @@ Bloom record is reserved for the future use, in case if search in the file will 
 
 **Structure:**
 
-- `chunk_seq: u64` sequence number of the record.
-- `m`: `u32` - total number of bits in the Bloom filter’s bitset (the length of the bit array).
-- `k`: `u8` - number of independent hash functions used to map a key into bit positions in that array.
-- `bitset`: `bytes[ceil(m/8)]` — actual bitset.
+```text
+┌──────────────────┬────────────────────────┬──────────────┐
+│ record_size      │ u32                    │              │
+├──────────────────┼────────────────────────┼──────────────┤
+│ record_type      │ u8                     │ 0x20         │
+│ chunk_seq        │ u64                    │              │
+│ m                │ u32                    │              │
+│ k                │ u8                     │              │
+│ bitset           │ u8[⌈m/8⌉]              │              │
+└──────────────────┴────────────────────────┴──────────────┘
+```
+
+- `chunk_seq` : `u64` — sequence number of the associated chunk record
+- `m` : `u32` — total number of bits in the Bloom filter’s bitset (the length of the bit array)
+- `k` : `u8` — number of independent hash functions used to map a key into bit positions
+- `bitset` : `u8[⌈m/8⌉]` — the actual bitset
 
 #### INDEX Record
 
@@ -325,8 +353,18 @@ Directory record is reserved for the future use, in case if index records or del
 
 **Structure:**
 
-- `metadata_offset:` `u64` offset of the previous metadata record, zero if there is no record
-- `index_offset:` `u64` offset of the last index record, zero if there is no record
+```text
+┌──────────────────┬────────────────────────┬──────────────┐
+│ record_size      │ u32                    │ 17           │
+├──────────────────┼────────────────────────┼──────────────┤
+│ record_type      │ u8                     │ 0x30         │
+│ metadata_offset  │ u64                    │              │
+│ index_offset     │ u64                    │              │
+└──────────────────┴────────────────────────┴──────────────┘
+```
+
+- `metadata_offset` : `u64` — offset of the previous metadata record, zero if there is none
+- `index_offset` : `u64` — offset of the last index record, zero if there is none
 
 #### META Record
 
@@ -334,13 +372,33 @@ Directory record is reserved for the future use, in case if index records or del
 
 **Structure:**
 
-- `entries: Entry[]` list of metadata entries, stored in lexicographical order
-- `footer: {entries_count: u64, entries_hash}`
+```text
+┌──────────────────┬────────────────────────┬──────────────┐
+│ record_size      │ u32                    │              │
+├──────────────────┼────────────────────────┼──────────────┤
+│ record_type      │ u8                     │ 0x31         │
+├── entries ×N ────┼────────────────────────┼──────────────┤
+│ subject_len      │ u32                    │              │
+│ subject          │ u8[subject_len]        │              │
+│ value_len        │ u32                    │              │
+│ value            │ u8[value_len]          │              │
+├── footer ────────┼────────────────────────┼──────────────┤
+│ entries_count    │ u64                    │              │
+│ entries_hash     │ u8[28]                 │              │
+└──────────────────┴────────────────────────┴──────────────┘
+```
 
-Entry:
+Each entry consists of:
 
-- `subject: URI` — subject stored in the `URI` format
-- `value: cbor` — data stored by the metadata entry owner.
+- `subject_len` : `u32` — byte length of the subject
+- `subject` : `u8[subject_len]` — subject stored in URI format
+- `value_len` : `u32` — byte length of the value
+- `value` : `u8[value_len]` — CBOR-encoded data stored by the metadata entry owner
+
+Footer:
+
+- `entries_count` : `u64` — number of entries in the record
+- `entries_hash` : `u8[28]` — Blake2b-224 hash of the entries
 
 **Policy:**
 
