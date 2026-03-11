@@ -89,24 +89,23 @@ New namespaces may and will be introduced in the future. With new eras and featu
 | 0x30 | DIR      | Directory footer with offsets to metadata/index regions (reserved for future) |
 | 0x31 | META     | Opaque metadata entries (e.g., signatures, notes)                             |
 
-Proposed file layout:
+Proposed file layout (EBNF):
 
-```text
-HDR,
-(CHUNK[, BLOOM])*,
-MANIFEST,
-[INDEX]*,
-[META]*
-[DIR],
-[ (DELTA[, BLOOM])* , MANIFEST, [INDEX]*, [DIR] ]*
+```ebnf
+file          = HDR , chunk_section , MANIFEST ,
+                INDEX* , META* , [ DIR ] ,
+                delta_section* ;
+
+chunk_section = ( CHUNK , [ BLOOM ] )* ;
+
+delta_section = ( DELTA , [ BLOOM ] )* , MANIFEST ,
+                INDEX* , [ DIR ] ;
 ```
 
 At the first steps of implementation it would be enough to have the simpler structure:
 
-```text
-HDR,
-(CHUNK)*,
-MANIFEST
+```ebnf
+file = HDR , CHUNK* , MANIFEST ;
 ```
 
 All the other record types allow the introduction of additional features, like delta-states, querying data and may be omitted in case the user does not want those functionalities.
