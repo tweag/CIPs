@@ -119,7 +119,15 @@ For the additional record types (all except `HDR, CHUNK, MANIFEST`) it's possibl
 
 **Structure:**
 
-`REC_HDR` (once at start of file)
+```text
+┌──────────────────┬────────────────────────┬──────────────┐
+│ record_size      │ u32                    │ 9            │
+├──────────────────┼────────────────────────┼──────────────┤
+│ record_type      │ u8                     │ 0x00         │
+│ magic            │ u8[4]                  │ "SCLS"       │
+│ version          │ u32                    │              │
+└──────────────────┴────────────────────────┴──────────────┘
+```
 
 - `magic` : `b"SCLS"`
 - `version` : `u32` (start with `1`)
@@ -136,17 +144,40 @@ For the additional record types (all except `HDR, CHUNK, MANIFEST`) it's possibl
 
 **Structure:**
 
+```text
+┌──────────────────┬────────────────────────┬──────────────┐
+│ record_size      │ u32                    │              │
+├──────────────────┼────────────────────────┼──────────────┤
+│ record_type      │ u8                     │ 0x10         │
+│ chunk_seq        │ u64                    │              │
+│ chunk_format     │ u8                     │              │
+│ namespace_len    │ u32                    │              │
+│ namespace        │ u8[namespace_len]      │              │
+│ key_len          │ u32                    │              │
+├── entries ×N ────┼────────────────────────┼──────────────┤
+│ entry_size       │ u32                    │              │
+│ key              │ u8[key_len]            │              │
+│ value            │ u8[entry_size-key_len] │              │
+├── footer ────────┼────────────────────────┼──────────────┤
+│ entries_count    │ u32                    │              │
+│ chunk_hash       │ u8[28]                 │              │
+└──────────────────┴────────────────────────┴──────────────┘
+```
+
 - `chunk_seq` : `u64` — sequence number of the record
-- `chunk_format` : `u8` - format of the chunks, indicating compression scheme (see data compression table below)
-- `namespace` : `bstr` — namespace of the values stored in the CHUNK
-- `entries` : `DataEntry` — list of length-prefixed data entries
-- `footer {entries_count: u32, chunk_hash: blake28}` — hash value of the chunk of data, is used to keep integrity of the file.
+- `chunk_format` : `u8` — compression scheme (see data compression table below)
+- `namespace_len` : `u32` — byte length of the namespace string
+- `namespace` : `u8[namespace_len]` — UTF-8 encoded namespace name
+- `key_len` : `u32` — fixed key size for all entries in this namespace; all keys within a namespace share the same size
+- `entries` : repeated `DataEntry` records (see below)
+- `entries_count` : `u32` — number of entries (footer)
+- `chunk_hash` : `u8[28]` — Blake2b-224 hash of the chunk entries (footer)
 
-`DataEntry` is a blob of a key-valued data. The structure of the `DataEntry` is the following:
+Each `DataEntry` is a key-value pair:
 
-- `size` : `u32` - size of the data
-- `key` : `fixed size` - key is a fixed size blob where size depends on the namespace
-- `value` : `bstr` — cbor data entry
+- `entry_size` : `u32` — combined size of key + value
+- `key` : `u8[key_len]` — fixed-size key (size given by `key_len` in the chunk header)
+- `value` : `u8[entry_size - key_len]` — CBOR-encoded value
 
 While the format requires each entry to have a key, it's still possible to support hierarchical structures, either by normalizing them
 and keeping a path or hash as a key or by introducing an artificial key and keeping the entire hierarchy in a single key. The choice depends on each
@@ -180,22 +211,56 @@ When calculating and verifying hashes, its built over the uncompressed data.
 
 **Structure:**
 
-- `slot_no` : `u64` identifier of the blockchain point (slot number).
-- `total_entries`: `u64` — number of data entries in the file (integrity purpose only)
-- `total_chunks`: `u64` — number of chunks in the file (integrity purpose only)
-- `root_hash`: `Digest` - **global Merkle root**, computed over the per-namespace Merkle roots in lexicographic namespace order (see [Verification](#verification) section for details)
-- `namespace_info`: a list of `{ entries_count, chunks_count, name, digest }` for each namespace in the file, where:
-  - `entries_count`: `u64` — number of entries in the namespace
-  - `chunks_count`: `u64` — number of chunks for the namespace
-  - `name`: `bstr` — namespace name
-  - `digest`: `Digest` - Merkle root of all `entry_e` in the namespace
-- `prev_manifest`: `u64` — offset of the previous manifest (used with delta files), zero if there is no previous manifest entry
-- `summary`: `{ created_at, tool, comment? }`
-- `offset`: `u32` — offset to the beginning of the MANIFEST record
+```text
+┌──────────────────┬────────────────────────┬──────────────┐
+│ record_size      │ u32                    │              │
+├──────────────────┼────────────────────────┼──────────────┤
+│ record_type      │ u8                     │ 0x01         │
+│ slot_no          │ u64                    │              │
+│ total_entries    │ u64                    │              │
+│ total_chunks     │ u64                    │              │
+├── summary ───────┼────────────────────────┼──────────────┤
+│ created_at_len   │ u32                    │              │
+│ created_at       │ u8[created_at_len]     │              │
+│ tool_len         │ u32                    │              │
+│ tool             │ u8[tool_len]           │              │
+│ comment_len      │ u32                    │              │
+│ comment          │ u8[comment_len]        │              │
+├── ns_info ×N ────┼────────────────────────┼──────────────┤
+│ ns_len           │ u32                    │              │
+│ entries_count    │ u64                    │              │
+│ chunks_count     │ u64                    │              │
+│ name             │ u8[ns_len]             │              │
+│ digest           │ u8[28]                 │              │
+├──────────────────┼────────────────────────┼──────────────┤
+│ ns_sentinel      │ u32                    │ 0x00000000   │
+│ prev_manifest    │ u64                    │              │
+│ root_hash        │ u8[28]                 │              │
+│ offset           │ u32                    │              │
+└──────────────────┴────────────────────────┴──────────────┘
+```
+
+- `slot_no` : `u64` — blockchain slot number identifying the state point
+- `total_entries` : `u64` — number of data entries in the file (integrity purpose only)
+- `total_chunks` : `u64` — number of chunks in the file (integrity purpose only)
+- `summary` : three length-prefixed (`u32` length + `u8[len]` data) UTF-8 strings:
+  - `created_at` — ISO 8601 timestamp when the file was generated
+  - `tool` — name of the generating tool
+  - `comment` — optional comment (may be zero-length)
+- `namespace_info` : per-namespace metadata, terminated by a sentinel (`ns_len = 0`); each entry contains:
+  - `ns_len` : `u32` — byte length of the namespace name
+  - `entries_count` : `u64` — number of entries in the namespace
+  - `chunks_count` : `u64` — number of chunks for the namespace
+  - `name` : `u8[ns_len]` — UTF-8 encoded namespace name
+  - `digest` : `Digest` — Merkle root of all entries in the namespace
+- `ns_sentinel` : `u32 = 0` — terminates the namespace info vector
+- `prev_manifest` : `u64` — absolute offset of the previous manifest record, zero if none (used with delta files)
+- `root_hash` : `Digest` — **global Merkle root**, computed over the per-namespace Merkle roots in lexicographic namespace order (see [Verification](#verification) section for details)
+- `offset` : `u32` — offset to the beginning of this MANIFEST record
 
 `Digest` is defined as a fixed-size 224-bit (28-byte) Blake2b hash.
 
-Note that the offset should always be equal to the record length. This has the effect of bookending MANIFEST records with the same 4 bytes.
+Note that `offset` should always be equal to `record_size`. This has the effect of bookending MANIFEST records with the same 4 bytes.
 
 **Policy:** used to verify all the chunks.
 
