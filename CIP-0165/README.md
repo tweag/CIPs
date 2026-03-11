@@ -195,6 +195,20 @@ and updated as a whole, a single artificial key can be used.
 - readers should verify footer before relying on the data;
 - `chunk_hash = H(concat [ digest(e) | e in entries ])`;
 
+A namespace may span multiple consecutive `CHUNK` records, but once a `CHUNK` for a later namespace appears, no further `CHUNK` records for the earlier namespace are permitted. For example:
+
+```text
+CHUNK ns:"a" [k1:v1, k2:v2]  =>  valid: namespace "a" spans two chunks
+CHUNK ns:"a" [k3:v3]
+CHUNK ns:"b" [k1:v1]         =>  valid: "b" > "a"
+```
+
+```text
+CHUNK ns:"a" [k1:v1, k2:v2]
+CHUNK ns:"b" [k1:v1]
+CHUNK ns:"a" [k3:v3]         =>  invalid: "a" reappears after "b"
+```
+
 The format proposes support of data compression. For future-compatibility the format is described by the `chunk_format` field, and following variants are introduced:
 
 | Code | Name  | Description                                   |
