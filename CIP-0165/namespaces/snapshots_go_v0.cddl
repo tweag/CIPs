@@ -23,9 +23,6 @@
 ;            cases:
 ;              0: credential
 ;              1: keyhash
-;        - id: padding
-;          type: u1
-;          const: 0
 ;        - id: value_type
 ;          type: u1
 ;          enum: snapshot_value
@@ -39,8 +36,6 @@
 ;      seq:
 ;        - id: keyhash_data
 ;          size: 28
-;        - id: dummy
-;          size: 1
 ;
 ;    snapshot_value:
 ;      0: coin
