@@ -23,9 +23,9 @@
 ;            cases:
 ;              0: credential
 ;              1: keyhash
-;        - id: stage
+;        - id: padding
 ;          type: u1
-;          enum: snapshot_value
+;          const: 0
 ;        - id: value_type
 ;          type: u1
 ;          enum: snapshot_value
@@ -42,11 +42,6 @@
 ;        - id: dummy
 ;          size: 1
 ;
-;  enums:
-;    snapshot_stage:
-;      0: mark
-;      1: set
-;      2: go
 ;    snapshot_value:
 ;      0: coin
 ;      1: address
