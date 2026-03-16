@@ -30,12 +30,15 @@
 ;    credential:
 ;      seq:
 ;        - id: cred_data
-;          size: 28
+;          size: 29
 ;
 ;    keyhash:
 ;      seq:
 ;        - id: keyhash_data
 ;          size: 28
+;        - id: dummy
+;          type: u1
+;          const: 0
 ;
 ;    snapshot_value:
 ;      0: coin
