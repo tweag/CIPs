@@ -45,7 +45,6 @@
 ;    snapshot_value:
 ;      0: coin
 ;      1: address
-;      2: pool_params
 ;  ```
 record_entry = snapshot_out
 
@@ -53,26 +52,13 @@ record_entry = snapshot_out
 ;   - Coin value
 ;   - Keyhash of an delegation address
 ;   - Pool parameters
-snapshot_out = [0, coin// 1, keyhash28// 2, pool_params]
+snapshot_out = [0, coin// 1, keyhash28]
 
 coin = uint
 
 keyhash28 = hash28
 
 hash28 = bytes .size 28
-
-pool_params =
-  { cost           : coin
-  , margin         : unit_interval
-  , pledge         : coin
-  , relays         : [* relay]
-  , operator       : pool_keyhash
-  , pool_owners    : set<addr_keyhash>
-  , vrf_keyhash    : vrf_keyhash
-  , pool_metadata  : pool_metadata/ nil
-  , reward_account : reward_account
-  }
-
 
 ; NOTE: The real unit_interval is: #6.30([uint, uint])
 ;
