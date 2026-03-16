@@ -70,7 +70,7 @@ Each logical table/type is a namespace identified by a canonical string (e.g., `
 | gov/constitution/v0 | Constitution                    |
 | gov/pparams/v0      | Protocol parameters             |
 | gov/proposals/v0    | Update proposals                |
-| nonce/v0            | Nonces                          |
+| nonces/v0           | Nonces                          |
 | snapshots/v0        | snapshots                       |
 | utxo/v0             | UTXOs                           |
 
