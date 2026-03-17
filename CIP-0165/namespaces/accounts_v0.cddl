@@ -1,0 +1,117 @@
+; This file was auto-generated from huddle.
+; Source: https://github.com/tweag/cardano-cls/blob/main/scls-cardano/cddl-src/Cardano/SCLS/Namespace/Accounts.hs
+
+;  The key for the entry is one of the following:
+; 
+;  ```
+;  meta:
+;    endian: be
+; 
+;  seq:
+;    - id: key
+;      type: section
+; 
+;  types:
+;    section:
+;      seq:
+;        - id: section_type
+;          type: u1
+;          enum: accounts_section
+;  enums:
+;    accounts_section:
+;      0: dstate
+;      1: pstate
+;  ```
+record_entry = accounts_out
+
+;  Information about accounts in the ledger state 
+accounts_out = {dstate : dstate, pstate : pstate}
+
+dstate = 
+  { delegation_map  : {* vkey_genesis => vkey}   
+  , last_delegation : {* vkey_genesis => slot_no}
+  }
+
+
+vkey_genesis = int64
+
+int64 = -9223372036854775808 .. 9223372036854775807
+
+vkey = bytes .size 32
+
+slot_no = uint .size 8
+
+pstate = 
+  { retiring                 : {* pool_keyhash => epoch_no}      
+  , vrf_key_hashes           : {* vrf_keyhash => word64_non_zero}
+  , future_stake_pool_params : {* pool_keyhash => pool_params}
+  }
+
+
+pool_keyhash = hash28
+
+hash28 = bytes .size 28
+
+epoch_no = uint .size 8
+
+vrf_keyhash = hash32
+
+hash32 = bytes .size 32
+
+word64_non_zero = 1 .. 18446744073709551615
+
+pool_params = 
+  { cost           : coin              
+  , margin         : unit_interval     
+  , pledge         : coin              
+  , relays         : [* relay]     
+  , operator       : pool_keyhash      
+  , pool_owners    : set<addr_keyhash>
+  , vrf_keyhash    : vrf_keyhash       
+  , pool_metadata  : pool_metadata/ nil
+  , reward_account : reward_account    
+  }
+
+
+coin = uint
+
+; NOTE: The real unit_interval is: #6.30([uint, uint])
+; 
+;  A unit interval is a number in the range between 0 and 1, which
+;  means there are two extra constraints:
+;     1. numerator <= denominator
+;     2. denominator > 0
+unit_interval = 
+  #6.30([uint .le 18446744073709551615, uint .le 18446744073709551615])
+
+relay = [0, single_host_addr]/ [1, single_host_name]/ [2, multi_host_name]
+
+;  A single host address relay 
+single_host_addr = (port/ nil, ipv4/ nil, ipv6/ nil)
+
+port = uint .le 65535
+
+ipv4 = bytes .size 4
+
+ipv6 = bytes .size 16
+
+single_host_name = (port/ nil, dns_name)
+
+dns_name = text .size (0 .. 128)
+
+multi_host_name = (dns_name)
+
+set<a0> = #6.258([* a0])
+
+addr_keyhash = hash28
+
+pool_metadata = [url, pool_metadata_hash]
+
+url = text .size (0 .. 128)
+
+pool_metadata_hash = bytes
+
+;  28 bytes hash and one byte for the network type 
+reward_account = bytes .size 29
+
+

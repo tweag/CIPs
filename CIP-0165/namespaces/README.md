@@ -6,6 +6,7 @@ Each namespace defines a non-intersecting slices of the data.
 
 | Shortname            | Content                         | Key size | Key description |
 | -------------------- | ------------------------------- | -------- | --------------- |
+| accounts/v0          | Accounts in the state           | 1        | segment of the state |
 | blocks/v0            | Blocks created                  | 36       | keyhash of the stake pool |
 | gov/committee/v0     | Governance action state         | 8        | epoch |
 | gov/constitution/v0  | Constitution                    | 8        | epoch |

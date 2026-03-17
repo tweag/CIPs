@@ -65,6 +65,7 @@ Each logical table/type is a namespace identified by a canonical string (e.g., `
 
 | Shortname           | Content                         |
 | ------------------- | ------------------------------- |
+| accounts/v0         | Accounts                        |
 | blocks/v0           | Blocks created                  |
 | gov/committee/v0    | Governance action state         |
 | gov/constitution/v0 | Constitution                    |
