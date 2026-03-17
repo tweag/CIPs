@@ -165,7 +165,7 @@ For the additional record types (all except `HDR, CHUNK, MANIFEST`) it's possibl
 └──────────────────┴────────────────────────┴──────────────┘
 ```
 
-- `chunk_seq` : `u64` — sequence number of the record
+- `chunk_seq` : `u64` — sequence number of the record, partitioned by namespace
 - `chunk_format` : `u8` — compression scheme (see data compression table below)
 - `namespace_len` : `u32` — byte length of the namespace string
 - `namespace` : `u8[namespace_len]` — UTF-8 encoded namespace name
