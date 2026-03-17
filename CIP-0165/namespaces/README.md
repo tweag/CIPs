@@ -12,7 +12,9 @@ Each namespace defines a non-intersecting slices of the data.
 | gov/pparams/v0       | Protocol parameters             | 4        | current, previous, or future |
 | gov/proposals/v0     | Update proposals                | 34       | address of the proposal in transactions |
 | nonces/v0            | Nonces                          | 1        | zero key |
-| snapshots/v0         | snapshots                       | 32       | key type, stage, value type (see docs) |
+| snapshots/mark/v0    | snapshots                       | 32       | key type, mark stage, value type (see docs) |
+| snapshots/set/v0     | snapshots                       | 32       | key type, set stage, value type (see docs) |
+| snapshots/go/v0      | snapshots                       | 32       | key type, go stage, value type (see docs) |
 | utxo/v0              | UTXOs                           | 34       | utxo address in the transaction |
 
 Key specifications are described in cddl specification comments.

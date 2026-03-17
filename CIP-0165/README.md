@@ -71,7 +71,9 @@ Each logical table/type is a namespace identified by a canonical string (e.g., `
 | gov/pparams/v0      | Protocol parameters             |
 | gov/proposals/v0    | Update proposals                |
 | nonces/v0           | Nonces                          |
-| snapshots/v0        | snapshots                       |
+| snapshots/mark/v0   | snapshots mark                  |
+| snapshots/set/v0    | snapshots set                   |
+| snapshots/go/v0     | snapshots go                    |
 | utxo/v0             | UTXOs                           |
 
 New namespaces may and will be introduced in the future. With new eras and features, new types of the data will be introduced and stored. In order to define what data is stored in the SCLS file, tools fill the `MANIFEST` record and define namespaces. The order of the namespaces does not change the signatures and other integrity data.
