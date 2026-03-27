@@ -7,6 +7,7 @@ Each namespace defines a non-intersecting slices of the data.
 | Shortname             | Content                 | Key size | Key description                             |
 | --------------------- | ----------------------- | -------- | ------------------------------------------- |
 | blocks/v0             | Blocks created          | 36       | keyhash of the stake pool                   |
+| entities/accounts/v0  | Accounts                | 8        | epoch                                       |
 | entities/committee/v0 | Entities committee      | 8        | epoch                                       |
 | entities/dreps/v0     | DReps                   | 29       | credential                                  |
 | gov/committee/v0      | Governance action state | 8        | epoch                                       |
