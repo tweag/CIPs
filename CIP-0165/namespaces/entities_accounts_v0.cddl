@@ -9,35 +9,15 @@
 ; 
 ;  seq:
 ;    - id: key
-;      type: entities_accounts
+;      type: credential
 ; 
 ;  types:
-;    entities_accounts:
+;    credential:
 ;      seq:
-;        - id: epoch
-;          doc: epoch
-;          type: u8
+;        - id: cred_data
+;          size: 28
 ;  ```
-record_entry = accounts
-
-;  Storage of the accounts
-accounts = {* credential => account_state}
-
-credential = [0, addr_keyhash// 1, script_hash]
-
-addr_keyhash = hash28
-
-hash28 = bytes .size 28
-
-;  To compute a script hash, note that you must prepend
-;  a tag to the bytes of the script before hashing.
-;  The tag is determined by the language.
-;  The tags in the Conway era are:
-;   - "\x00" for multisig scripts
-;   - "\x01" for Plutus V1 scripts
-;   - "\x02" for Plutus V2 scripts
-;   - "\x03" for Plutus V3 scripts
-script_hash = hash28
+record_entry = account_state
 
 ;  Account state consists of the following:
 ;  1 - account balance
@@ -50,6 +30,8 @@ coin = uint
 
 pool_keyhash = hash28
 
+hash28 = bytes .size 28
+
 ;  0 - key hash
 ;  1 - script hash
 ;  2 - always abstain
@@ -57,3 +39,13 @@ pool_keyhash = hash28
 drep = [0, keyhash28// 1, script_hash// 2// 3]
 
 keyhash28 = hash28
+
+;  To compute a script hash, note that you must prepend
+;  a tag to the bytes of the script before hashing.
+;  The tag is determined by the language.
+;  The tags in the Conway era are:
+;   - "\x00" for multisig scripts
+;   - "\x01" for Plutus V1 scripts
+;   - "\x02" for Plutus V2 scripts
+;   - "\x03" for Plutus V3 scripts
+script_hash = hash28
