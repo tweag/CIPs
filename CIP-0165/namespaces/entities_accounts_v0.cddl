@@ -19,18 +19,15 @@
 ;  ```
 record_entry = account_state
 
-;  Account state consists of the following:
-;  1 - account balance
-;  2 - account deposit
-;  3 - stake pool delegation (if the account is delegated to a stake pool)
-;  4 - drep delegation (if the account is delegated to a drep)
-account_state = [coin, coin, pool_keyhash/ nil, drep/ nil]
+account_state = 
+  { balance               : coin             
+  , deposit               : coin             
+  , drep_delegation       : drep/ nil        
+  , stake_pool_delegation : pool_keyhash/ nil
+  }
+
 
 coin = uint
-
-pool_keyhash = hash28
-
-hash28 = bytes .size 28
 
 ;  0 - key hash
 ;  1 - script hash
@@ -39,6 +36,8 @@ hash28 = bytes .size 28
 drep = [0, keyhash28// 1, script_hash// 2// 3]
 
 keyhash28 = hash28
+
+hash28 = bytes .size 28
 
 ;  To compute a script hash, note that you must prepend
 ;  a tag to the bytes of the script before hashing.
@@ -49,3 +48,5 @@ keyhash28 = hash28
 ;   - "\x02" for Plutus V2 scripts
 ;   - "\x03" for Plutus V3 scripts
 script_hash = hash28
+
+pool_keyhash = hash28
