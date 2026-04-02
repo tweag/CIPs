@@ -8,6 +8,7 @@ Each namespace defines a non-intersecting slices of the data.
 | --------------------- | ----------------------- | -------- | ------------------------------------------- |
 | blocks/v0             | Blocks created          | 36       | keyhash of the stake pool                   |
 | entities/committee/v0 | Entities committee      | 8        | epoch                                       |
+| entities/dreps/v0     | DReps                   | 29       | credential                                  |
 | gov/committee/v0      | Governance action state | 8        | epoch                                       |
 | gov/constitution/v0   | Constitution            | 8        | epoch                                       |
 | gov/pparams/v0        | Protocol parameters     | 4        | current, previous, or future                |
