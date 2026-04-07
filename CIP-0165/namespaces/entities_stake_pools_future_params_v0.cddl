@@ -1,0 +1,68 @@
+; This file was auto-generated from huddle.
+; Source: https://github.com/tweag/cardano-cls/blob/main/scls-cardano/cddl-src/Cardano/SCLS/Namespace/EntitiesStakePoolsFutureParams.hs
+
+;  The key for the namespace
+; 
+;  ```
+;  meta:
+;    endian: be
+; 
+;  seq:
+;    - id: keyhash_stakepool
+;          doc: keyhash of the stake pool
+;          size: 28
+;  ```
+record_entry = stake_pool_params
+
+stake_pool_params = 
+  { id              : pool_keyhash         
+  , vrf             : vrf_keyhash          
+  , cost            : coin                 
+  , margin          : unit_interval        
+  , owners          : set<staking_keyhash>
+  , pledge          : coin                 
+  , relays          : [* relay]        
+  , metadata        : pool_metadata/ nil   
+  , account_address : address              
+  }
+
+
+pool_keyhash = hash28
+
+hash28 = bytes .size 28
+
+vrf_keyhash = hash32
+
+hash32 = bytes .size 32
+
+coin = uint
+
+; NOTE: The real unit_interval is: #6.30([uint, uint])
+; 
+;  A unit interval is a number in the range between 0 and 1, which
+;  means there are two extra constraints:
+;     1. numerator <= denominator
+;     2. denominator > 0
+unit_interval = 
+  #6.30([uint .le 18446744073709551615, uint .le 18446744073709551615])
+
+set<a0> = #6.258([* a0])
+
+staking_keyhash = hash28
+
+relay = 
+  [0, port/ nil, ipv4/ nil, ipv6/ nil// 1, port/ nil, dns_name// 2, dns_name]
+
+port = uint .le 65535
+
+ipv4 = bytes .size 4
+
+ipv6 = bytes .size 16
+
+dns_name = text .size (0 .. 128)
+
+pool_metadata = [url, bytes]
+
+url = text .size (0 .. 128)
+
+address = bytes
