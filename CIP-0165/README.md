@@ -75,6 +75,7 @@ Each logical table/type is a namespace identified by a canonical string (e.g., `
 | gov/constitution/v0                    | Constitution               |
 | gov/pparams/v0                         | Protocol parameters        |
 | gov/proposals/v0                       | Update proposals           |
+| gov/proposals/roots/v0                 | Update proposals roots     |
 | nonces/v0                              | Nonces                     |
 | snapshots/mark/v0                      | snapshots mark             |
 | snapshots/set/v0                       | snapshots set              |

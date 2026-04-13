@@ -16,6 +16,7 @@ Each namespace defines a non-intersecting slices of the data.
 | gov/constitution/v0                    | Constitution               | 8        | epoch                                       |
 | gov/pparams/v0                         | Protocol parameters        | 4        | current, previous, or future                |
 | gov/proposals/v0                       | Update proposals           | 34       | address of the proposal in transactions     |
+| gov/proposals/roots/v0                 | Update proposals roots     | 1        | tag purpose of the proposal                 |
 | nonces/v0                              | Nonces                     | 1        | zero key                                    |
 | snapshots/mark/v0                      | snapshots                  | 32       | key type, mark stage, value type (see docs) |
 | snapshots/set/v0                       | snapshots                  | 32       | key type, set stage, value type (see docs)  |
