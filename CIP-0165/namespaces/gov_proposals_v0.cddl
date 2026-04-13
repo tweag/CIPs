@@ -24,8 +24,10 @@
 ;        doc: governance action index
 ;        type: u2
 ;  ```
-;
-record_entry = proposal
+; 
+record_entry = [word64, proposal]
+
+word64 = uint .size 8
 
 proposal =
   { drep_votes         : {* credential => vote}
