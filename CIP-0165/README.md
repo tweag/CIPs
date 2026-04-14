@@ -71,6 +71,7 @@ Each logical table/type is a namespace identified by a canonical string (e.g., `
 | entities/dreps/v0                      | DReps                      |
 | entities/stake_pools/v0                | Stake pools                |
 | entities/stake_pools_vrf_key_hashes/v0 | Stake pools VRF key hashes |
+| entities/durmant_epochs/v0             | Durmant epochs             |
 | gov/committee/v0                       | Governance action state    |
 | gov/constitution/v0                    | Constitution               |
 | gov/pparams/v0                         | Protocol parameters        |

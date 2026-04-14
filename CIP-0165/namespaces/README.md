@@ -12,6 +12,7 @@ Each namespace defines a non-intersecting slices of the data.
 | entities/dreps/v0                      | DReps                      | 29       | credential                                  |
 | entities/stake_pools/v0                | Stake pools                | 28       | stake pool key hash                         |
 | entities/stake_pools_vrf_key_hashes/v0 | Stake pools VRF key hashes | 32       | stake pool VRF key hash                     |
+| entities/durmant_epochs/v0             | Durmant epochs             | 1        | singleton value                             |
 | gov/committee/v0                       | Governance action state    | 8        | epoch                                       |
 | gov/constitution/v0                    | Constitution               | 8        | epoch                                       |
 | gov/pparams/v0                         | Protocol parameters        | 4        | current, previous, or future                |
