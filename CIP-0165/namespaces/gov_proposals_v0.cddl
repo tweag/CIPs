@@ -25,9 +25,7 @@
 ;        type: u2
 ;  ```
 ; 
-record_entry = [word64, proposal]
-
-word64 = uint .size 8
+record_entry = proposal
 
 proposal =
   { drep_votes         : {* credential => vote}
