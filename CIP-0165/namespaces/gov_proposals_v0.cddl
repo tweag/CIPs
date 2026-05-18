@@ -25,7 +25,7 @@
 ;        type: u2
 ;  ```
 ; 
-record_entry = [word64, proposal]
+record_entry = {order : word64, proposal : proposal}
 
 word64 = uint .size 8
 
