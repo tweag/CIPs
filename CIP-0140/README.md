@@ -1431,8 +1431,8 @@ The Praos security parameter $k_\text{praos} = 2160 \text{\,blocks} \approx 4320
 
 #### Committee selection
 
-Peras is implemented to support multiple committee-selection algorithms. The concrete selection mechanism is not fixed by the core Peras protocol, provided that it satisfies the security requirements of the voting and certificate scheme.
-The committee-selection mechanisms currently considered for Peras include **Weighted Fait-Accompli** (wFA) and **stake truncation** (currently peras supports the border scenario where all nodes with a positive stake votes).
+The concrete committee-selection mechanism is not fixed by the core Peras protocol, but must satisfy the security requirements of the voting and certificate scheme.
+Possible alternatives include **Weighted Fait-Accompli** (wFA), **stake truncation** or even simply allowing all nodes with a positive stake to vote.
 
 **Weighted Fait-Accompli (wFA)** (see references) combines a set of persistent voters—stake-pool operators with sufficiently high stake that always participate—with a varying set of non-persistent voters selected randomly according to stake. This reduces the variance of adversarial representation in the committee and provides a better committee-size-versus-security trade-off than conventional independent sortition. For Peras, wFA is also being considered specifically as the basis of the certificate scheme, where its parameterization may favor a larger proportion of persistent voters in order to reduce certificate size.
 
