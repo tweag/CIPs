@@ -124,7 +124,7 @@ The following informal, non-normative, pseudo-imperative summary of the Peras pr
 - The [*weight*](#weight) of a [*chain*](#chains) is its length plus the total of the boosts its blocks have received.
 - The lack of a quorum in a round typically triggers a *cool-down period* where no voting occurs.
 - Relevant vote certificates are typically *recorded* in a [*block*](#blocks) near the start  of a cool-down period.
-- Certificates [*expire*](#expiration) after a specified number of slots if they have not been included in a block. *Comment*: No longer eligible for inclusion into the block, it is long enough to at least one block to be produced in the honest chain.
+- Certificates [*expire*](#expiration) after a specified number of slots if they have not been included in a block. *Comment*: It means that they are no longer eligible for inclusion in a block.
 
 The protocol keeps track of the following [variables](#block-trees), initialized to the values below:
 
@@ -196,7 +196,7 @@ An [online simulator for Peras](https://peras-simulation.cardano-scaling.org/) i
 
 The following formal, relational specification for Peras type utilizes [Agda 2.6.4.3](https://github.com/agda/agda/tree/v2.6.4.3). See [the Appendix](#typechecking-this-specification) for instruction on type-checking this specification with the Agda compiler and see [github:input-output-hk/peras-design](https://github.com/input-output-hk/peras-design/) for proofs and other modules related to this specification.
 
-For simplicity, the Agda specification represents vote weights as natural numbers. The implementation uses rational-valued weights.
+For simplicity, the Agda specification represents vote weights as natural numbers. The implementation uses rational-valued weights. The values come from a real stake distribution and normalized according to the committee selection scheme that is used.
 
 ```agda
 module README where
@@ -873,8 +873,10 @@ where `SeenInCertificateRound` means that the certificate was seen within the fi
 SeenInCertificateRound : Nat → Nat → Certificate → Maybe SlotNumber → Set
 SeenInCertificateRound u delta cert Nothing = ⊥
 SeenInCertificateRound u delta cert (Just seen) =
-  let start = getRoundNumber (round cert) * fromNat u
-      received = getSlotNumber seen
+  let roundStartSlot = getRoundNumber (round cert) * fromNat u
+      arrivalSlot = getSlotNumber seen
+  in roundStartSlot ≤ arrivalSlot
+       × arrivalSlot ≤ roundStartSlot + fromNat delta
 ```
 
 - `VR-1B`: The block being voted upon extends the most recently certified block
@@ -1223,7 +1225,7 @@ Not all parameters used by Peras need to be represented as governable ledger pro
 | ppPerasMinCandidateBlockAge | $L$ | SlotInterval | The minimum age of a candidate block for being voted upon. | 30 |
 | ppPerasCertBoost | B | Word16 | The extra chain weight that a certificate gives to a block. | 15 |
 | ppPerasTargetCommitteeSize | $n$ | Word16 | The number of members on the voting committee. | 900 |
-| ppPerasBootstrapRound | $R_\mathsf{bootstrap}$ | StrictMaybe Word64 | Peras round number used to manually bootstrap. Peras voting for the first time and to resynchronize voting after unexpected failures. | Nothing |
+| ppPerasBootstrapRound | $R_\mathsf{bootstrap}$ | StrictMaybe Word32 | Peras round number used to manually bootstrap. Peras voting for the first time and to resynchronize voting after unexpected failures. | Nothing |
 | ppPerasHealingFactor | $h$ | PositiveInterval | Coefficient used when deriving the healing period. | 2 |
 | ppPerasQuorumThresholdSafetyMargin | $\tau_\mathsf{margin}$ | PositiveInterval | Additional safety margin applied when deriving the quorum threshold. | 0.1 |
 
@@ -1429,8 +1431,8 @@ The Praos security parameter $k_\text{praos} = 2160 \text{\,blocks} \approx 4320
 
 #### Committee selection
 
-Peras is designed to support multiple committee-selection algorithms. The concrete selection mechanism is not fixed by the core Peras protocol, provided that it satisfies the security requirements of the voting and certificate scheme.
-The committee-selection mechanisms currently considered for Peras include **Weighted Fait-Accompli** (wFA) and **stake truncation**.
+Peras is implemented to support multiple committee-selection algorithms. The concrete selection mechanism is not fixed by the core Peras protocol, provided that it satisfies the security requirements of the voting and certificate scheme.
+The committee-selection mechanisms currently considered for Peras include **Weighted Fait-Accompli** (wFA) and **stake truncation** (currently peras supports the border scenario where all nodes votes).
 
 **Weighted Fait-Accompli (wFA)** (see references) combines a set of persistent voters—stake-pool operators with sufficiently high stake that always participate—with a varying set of non-persistent voters selected randomly according to stake. This reduces the variance of adversarial representation in the committee and provides a better committee-size-versus-security trade-off than conventional independent sortition. For Peras, wFA is also being considered specifically as the basis of the certificate scheme, where its parameterization may favor a larger proportion of persistent voters in order to reduce certificate size.
 
@@ -1442,10 +1444,7 @@ These mechanisms make different trade-offs. wFA provides stronger support for ad
 
 The Peras protocol therefore does not assume that committee selection is permanently tied to a single algorithm. The selected mechanism and its parameters form part of the voting and certificate design and may evolve independently of the core Peras consensus rules.
 
-<!-- The *committee size* of $n = 900 \text{\,parties}$ corresponds to a one in a million chance of not reaching a quorum if 10% of the parties do not vote for the majority block (either because they are adversarial, offline, didn't receive the block, or chose to vote for a block on a non-preferred fork). This "no quorum" probability is equivalent to one missed quorum in every 1.2 years. The *quorum size* of $\tau = \left\lceil 3 n / 4 \right\rceil = 675 \text{\,parties}$ is computed from this.
--->
-
-At dashboard for computing the probabilistic implications of Peras protocol parameters is a available at https://peras.cardano-scaling.org/dashboard/.
+At dashboard for computing the probabilistic implications of Peras protocol parameters is a available at https://peras.cardano-scaling.org/dashboard/ and https://tweag.github.io/cardano-peras/dashboard/ .
 
 ### Attack and mitigation
 
@@ -1561,7 +1560,7 @@ Thus, Peras should not have any significant impact on the memory requirements of
 
 - [x] Detailed node-level (as opposed to this protocol-level) specification. (TODO: Link to doc)
 - [ ] Develop node-level conformance test suite.
-- [ ] Consider developing a "quick and dirty" implementation for large scale experiments.
+- Consider developing a "quick and dirty" implementation for large scale experiments.
 - Coordinate with related activities on other protocol enhancements.
     - Compatibility between Peras, Leios, and Genesis.
     - Common design and implementation for certificates, voting, and related key registration: Mithril, Peras, Leios, and partner chains.
