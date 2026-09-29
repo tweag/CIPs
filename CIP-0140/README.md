@@ -123,8 +123,8 @@ The following informal, non-normative, pseudo-imperative summary of the Peras pr
 - A quorum of votes for a block gives that block's weight a [*boost*](#boost).
 - The [*weight*](#weight) of a [*chain*](#chains) is its length plus the total of the boosts its blocks have received.
 - The lack of a quorum in a round typically triggers a *cool-down period* where no voting occurs.
-- Relevant vote certificates are typically *recorded* in a [*block*](#blocks) near the start  of a cool-down period.
-- Certificates [*expire*](#expiration) after a specified number of slots if they have not been included in a block. *Comment*: It means that they are no longer eligible for inclusion in a block.
+- Relevant vote certificates are typically *recorded* in a [*block*](#blocks) near the start of a cool-down period.
+- Certificates [*expire*](#expiration) after a specified number of slots if they have not been included in a block. This merely makes them ineligible for inclusion in a block; certificates are nonetheless retained so that syncing nodes can replay the chain.
 
 The protocol keeps track of the following [variables](#block-trees), initialized to the values below:
 

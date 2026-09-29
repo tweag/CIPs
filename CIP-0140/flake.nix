@@ -53,7 +53,6 @@
             meta = { };
             src = ./.;
             preConfigure = ''
-              cp README.md README.lagda.md
               echo "open import README" > Everything.agda
             '';
             buildInputs = [ localAgda ];
