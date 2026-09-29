@@ -23,7 +23,7 @@ License: Apache-2.0
 
 ## Abstract
 
-We propose Ouroboros Peras, an enhancement to the Ouroboros Praos protocol that introduces a voting layer for fast settlement. It is adaptively secure, supports dynamic participation, and integrates self healing. Voting provides a “boost” to blocks that receive a quorum of votes, and this dramatically reduces the roll-back probability of the boosted block and its predecessors. Fast settlement occurs in the presence of adversaries with up to one-quarter of the stake, but Praos-like safety is maintained when adversaries control more than that amount of stake. In fact, the protocol enters a “cool-down period” of Praos-like behavior when adversaries prevent voting quorums; that cool-down period is exited only when the chain has healed, achieves chain quality, and reaches a common prefix. For realistic settings of the Peras protocol parameters, blocks can be identified (with overwhelming probability) *ex post facto* as being settled versus rolled-back after as little as two minutes. This enables use cases like partner-chains and bridges where high certainty for the status of a transaction is required in a brief time. The protocol requires the implementation of a vote-diffusion layer, certificates that aggregate votes, and one minor addition to the contents of a block.
+We propose Ouroboros Peras, an enhancement to the Ouroboros Praos protocol that introduces a voting layer for fast settlement. It is adaptively secure, supports dynamic participation, and integrates self healing. Voting provides a “boost” to blocks that receive a quorum of votes, and this dramatically reduces the roll-back probability of the boosted block and its predecessors. Fast settlement occurs in the presence of adversaries with up to one-quarter of the stake, but Praos-like safety is maintained when adversaries control more than that amount of stake. In fact, the protocol enters a “cool-down period” of Praos-like behavior when adversaries prevent voting quorums; that cool-down period is exited only when the chain has healed, achieves chain quality, and reaches a common prefix. For realistic settings of the Peras protocol parameters, blocks can be identified (with overwhelming probability) *ex post facto* as being settled versus rolled-back after as little as two minutes. This enables use cases like partner-chains and bridges where high certainty for the status of a transaction is required in a brief time. The protocol requires the implementation of a vote-diffusion layer, certificates that aggregate votes, a certificate-diffusion layer, and one minor addition to the contents of a block.
 
 <details>
   <summary><h2>Table of contents</h2></summary>
@@ -123,8 +123,8 @@ The following informal, non-normative, pseudo-imperative summary of the Peras pr
 - A quorum of votes for a block gives that block's weight a [*boost*](#boost).
 - The [*weight*](#weight) of a [*chain*](#chains) is its length plus the total of the boosts its blocks have received.
 - The lack of a quorum in a round typically triggers a *cool-down period* where no voting occurs.
-- Relevant vote certificates are typically *recorded* in a [*block*](#blocks) near the start and finish of a cool-down period.
-- Certificates [*expire*](#expiration) after a specified number of slots if they have not been included in a block.
+- Relevant vote certificates are typically *recorded* in a [*block*](#blocks) near the start  of a cool-down period.
+- Certificates [*expire*](#expiration) after a specified number of slots if they have not been included in a block. *Comment*: No longer eligible for inclusion into the block, it is long enough to at least one block to be produced in the honest chain.
 
 The protocol keeps track of the following [variables](#block-trees), initialized to the values below:
 
@@ -140,13 +140,14 @@ A [*fetching*](#fetching) operation occurs at the beginning of each slot:
 - Fetch new chains $\mathcal{C}\_\text{new}$ and votes $\mathcal{V}\_\text{new}$.
 - Add any new chains in $\mathcal{C}\_\text{new}$ to $\mathcal{C}$, add any new certificates contained in chains in $\mathcal{C}\_\text{new}$ to $\mathsf{Certs}$.
 - Add $\mathcal{V}\_\text{new}$ to $\mathcal{V}$ and turn any new quorum in $\mathcal{V}$ into a certificate $\mathsf{cert}$ and add $\mathsf{cert}$ to $\mathsf{Certs}$.
-    -  Ignore all but the first equivocating vote: i.e., do not add them to $\mathcal{V}$.
+  - Ignore all but the first equivocating vote: i.e., do not add them to $\mathcal{V}$.
 
-       This requires diffusing certificates in cases where different honest nodes received different equivocating votes.
+    This requires diffusing certificates in cases where different honest nodes received different equivocating votes.
 - Set $C_\text{pref}$ to the heaviest (w.r.t. $\mathsf{Wt}\_\mathsf{P}(\cdot)$ ) valid chain in $\mathcal{C}$.
-    - Each party $\mathsf{P}$ assigns a certain weight to every chain $C$, based on $C$'s length and all certificates that vote for blocks in $C$ that $\mathsf{P}$ has seen so far (and thus stored in a local list $\mathsf{Certs}$).
-    - Let $\mathsf{certCount}\_\mathsf{P}(C)$ denote the number of such certificates: i.e., $\mathsf{certCount}\_\mathsf{P}(C) := \left| \left\\{ \mathsf{cert} \in \mathsf{Certs} : \mathsf{cert} \text{ votes for a block on } C \right\\} \right|$.
-    - Then the weight of the chain $C$ in $\mathsf{P}$'s view is $\mathsf{Wt}\_\mathsf{P}(C) := \mathsf{len}(C) + B \cdot \mathsf{certCount}\_\mathsf{P}(C)$ for a protocol parameter $B$.
+  - Each party $\mathsf{P}$ assigns a certain weight to every chain $C$, based on $C$'s length and all certificates that vote for blocks in $C$ that $\mathsf{P}$ has seen so far (and thus stored in a local list $\mathsf{Certs}$).
+  - Each certificate contributes a boost equal to the value of the protocol parameter $B$ that was in effect when the certificate was forged. Therefore, the weight of a chain $C$ in $\mathsf{P}$'s view is its length plus the sum of the boosts associated with certificates that point to blocks on $C$:
+  $\mathsf{Wt}\_\mathsf{P}(C) := \mathsf{len}(C) + \sum_{c \in C}{\mathsf{Wt}(c)}$, where $\mathsf{Wt}(c)$.
+
 - Set $\mathsf{cert}^\prime$ to the certificate with the highest round number in $\mathsf{Certs}$.
 - Set $\mathsf{cert}^*$ to the certificate with the highest round number present in $C_\text{pref}$.
 
@@ -166,7 +167,7 @@ During [*voting*](#voting), each party $\mathsf{P}$ does the following at the be
 - Let $\mathsf{block}$ be the youngest block at least $L$ slots old on $C_\text{pref}$.
 - If party $\mathsf{P}$ is (voting) committee member in a round $r$,
     - either
-        - : $\mathsf{round}(\mathsf{cert}^\prime) = r-1$ and $\mathsf{cert}^\prime$ was received before the end of round $r-1$, and
+        - : $\mathsf{round}(\mathsf{cert}^\prime) = r-1$ and $\mathsf{cert}^\prime$ was received in the first $\Delta$ slots of round $r-1$, and
         - : $\mathsf{block}$ extends (i.e., has the ancestor or is identical to) the block certified by $\mathsf{cert}^\prime$,
     - or
         - : $r \geq \mathsf{round}(\mathsf{cert}^\prime) + R$, and
@@ -189,10 +190,13 @@ The diagram below illustrates the key concepts and entities in Peras. In additio
 
 An [online simulator for Peras](https://peras-simulation.cardano-scaling.org/) is available.
 
-
 ### Normative Peras specification in Agda
 
+- TODO: add protocol parameters
+
 The following formal, relational specification for Peras type utilizes [Agda 2.6.4.3](https://github.com/agda/agda/tree/v2.6.4.3). See [the Appendix](#typechecking-this-specification) for instruction on type-checking this specification with the Agda compiler and see [github:input-output-hk/peras-design](https://github.com/input-output-hk/peras-design/) for proofs and other modules related to this specification.
+
+For simplicity, the Agda specification represents vote weights as natural numbers. The implementation uses rational-valued weights.
 
 ```agda
 module README where
@@ -514,7 +518,7 @@ record BlockBody : Set where
 
 #### Blocks
 
-*Blocks* are identical to those in Praos, except for the rare inclusion of a certificate, which may happen near the beginning or ending of a cool-down period. The other detailed contents are irrelevant for Peras, so we represent them in a slightly simplified manner.
+*Blocks* are identical to those in Praos, except for the rare inclusion of a certificate, which may happen near the beginning of a cool-down period. The other detailed contents are irrelevant for Peras, so we represent them in a slightly simplified manner.
 
 ```agda
 record Block where
@@ -548,6 +552,7 @@ genesisHash = MkHash emptyBS
 cert₀ : Certificate
 cert₀ = MkCertificate (MkRoundNumber 0) genesisHash
 ```
+
 #### Chains
 
 The linking of blocks into a *chain* is identical to Praos.
@@ -557,12 +562,14 @@ Chain = List Block
 ```
 
 The genesis chain is the empty list.
+
 ```agda
 genesis : Chain
 genesis = []
 ```
 
 The protocol scrutinizes any certificates recorded on the chain.
+
 ```agda
 certsFromChain : Chain → List Certificate
 certsFromChain = mapMaybe Block.certificate
@@ -578,14 +585,21 @@ _PointsInto?_ : ∀ (c : Certificate) → (ch : Chain) → Dec (c PointsInto ch)
 _PointsInto?_ c = any? ((Certificate.blockRef c ≟-BlockHash_) ∘ hash)
 ```
 
-Peras differs from Praos in that the <span id="#weight"/>weight of a chain is its length plus the boost parameter $B$ times the number of vote quorums (certificates) its blocks have received.
+Peras differs from Praos in that the <span id="#weight"/>weight of a chain is its length plus the sum of the boosts contributed by certificates for blocks on that chain.
 
 ```agda
 module _ ⦃ _ : Params ⦄ where
   open Params ⦃...⦄
 
   ∥_∥_ : Chain → List Certificate → ℕ
-  ∥ ch ∥ cts = ∣ ch ∣ + ∣ filter (_PointsInto? ch) cts ∣ * B
+    where
+      certificateBoost : Block → Nat
+      certificateBoost block = foldr max 0 (map Certificate.weight (filter (λ cert → hash block == blockRef cert) cts))
+
+      chainWeight' : Nat → Chain → Nat
+      chainWeight' accum [] = accum
+      chainWeight' accum (block ∷ blocks) =
+        chainWeight' (accum + 1 + certificateBoost block) blocks
 ```
 
 The protocol can identify a chain by the hash of its most recent block (its tip).
@@ -844,11 +858,23 @@ The block selected for voting is the most recent one on the preferred chain that
 
 Voting is allowed in a round if voting has proceeded regularly in preceding rounds or if a sufficient number of slots have lapsed since the protocol entered a cool-down period. Specifically, either of two pairs of conditions must be met.
 
-- `VR-1A`: The vote has seen the certificate for the previous round.
+- `VR-1A`: The party has received the certificate for the previous round sufficiently early.
 
 ```agda
     VotingRule-1A : RoundNumber → T → Set
-    VotingRule-1A (MkRoundNumber r) t = r ≡ Certificate.roundNumber (latestCertSeen t) + 1
+    VotingRule-1A (MkRoundNumber r) t =
+      r ≡ Certificate.roundNumber (latestCertSeen t) + 1
+        × SeenInCertificateRound U Δ cert (certSeenAt t cert)
+```
+
+where `SeenInCertificateRound` means that the certificate was seen within the first $\Delta$ slots of round $r-1$
+
+```agda
+SeenInCertificateRound : Nat → Nat → Certificate → Maybe SlotNumber → Set
+SeenInCertificateRound u delta cert Nothing = ⊥
+SeenInCertificateRound u delta cert (Just seen) =
+  let start = getRoundNumber (round cert) * fromNat u
+      received = getSlotNumber seen
 ```
 
 - `VR-1B`: The block being voted upon extends the most recently certified block
@@ -953,7 +979,8 @@ Ticking the global clock increments the slot number and decrements the delay of 
 
 #### Updating the global state
 
-New messages are buffered, recorded in the global history, and will update a party's portion of the global state.`
+New messages are buffered, recorded in the global history, and will update a party's portion of the global state.
+
 ```agda
     _,_⇑_ : Message → (Party → Delay) → State → State
     m , fᵈ ⇑ M =
@@ -965,7 +992,9 @@ New messages are buffered, recorded in the global history, and will update a par
         }
       where open State M
 ```
+
 This occurs when a message diffuses to new parties.
+
 ```agda
     delay_by_update_ : Message → (Party → Delay) → State → State
     delay m@(ChainMsg x) by fᵈ update M = m , fᵈ ⇑ M
@@ -1185,6 +1214,27 @@ The structure of the Peras protocol imposes the following constraints on its [pa
 | Common-prefix time      | $T_\text{CP}$   | slots   | Achieve settlement.                                                                       | $T_\text{CP} = \mathcal{O} (k/f)$                                | The Ouroboros Praos security parameter defines the time for having a common prefix.       |
 | Security parameter      | $k$             | blocks  | The Ouroboros Praos security parameter.                                                   | n/a                                                              | Value for the Cardano mainnet.                                                            |
 
+#### Governable protocol parameters
+
+Not all parameters used by Peras need to be represented as governable ledger protocol parameters. Some values can instead be derived from other protocol parameters. The following Peras parameters are exposed through the ledger and can be changed through governance.
+
+| Parameter | Symbol | Units | Description | Default |
+| --------- | ------ | ----- | ----------- | ------- |
+| ppPerasMinCandidateBlockAge | $L$ | SlotInterval | The minimum age of a candidate block for being voted upon. | 30 |
+| ppPerasCertBoost | B | Word16 | The extra chain weight that a certificate gives to a block. | 15 |
+| ppPerasTargetCommitteeSize | $n$ | Word16 | The number of members on the voting committee. | 900 |
+| ppPerasBootstrapRound | $R_\mathsf{bootstrap}$ | StrictMaybe Word64 | Peras round number used to manually bootstrap. Peras voting for the first time and to resynchronize voting after unexpected failures. | Nothing |
+| ppPerasHealingFactor | $h$ | PositiveInterval | Coefficient used when deriving the healing period. | 2 |
+| ppPerasQuorumThresholdSafetyMargin | $\tau_\mathsf{margin}$ | PositiveInterval | Additional safety margin applied when deriving the quorum threshold. | 0.1 |
+
+#### Dependencies between parameters
+
+| Parameters | Formula |
+| ---- | ----- |
+| $T_\text{CQ}$ | $T_{CQ} = k / f$ |
+| $T_\mathsf{heal}$ | $T_\mathsf{heal} =  k ( B / f)$ |
+| $\tau_\mathsf{base} | $\tau_\mathsf{base} = 0.75$ |
+| $K$ | $K = \left\lceil \frac{A + T_\text{CP}}{U}$ |
 
 ### Specification of votes and certificates
 
@@ -1203,6 +1253,8 @@ Additionally one would like the following property to be provided by the voting 
 The precise scheme and format for votes and certificates is immaterial to the protocol itself and is deferred to another proposed CIP [*Votes & Certificates on Cardano*](https://github.com/cardano-foundation/CIPs/pull/870) or to [the scheme documented in the Peras repository](https://github.com/input-output-hk/peras-design/blob/main/analytics/certificates-jan2025.md). Presumably, voting and certificates will be handled uniformly across Mithril, Peras, Leios, and partner chains.
 
 ### CDDL schema for the ledger
+
+TODO: check what we actually have in the ledger
 
 Peras requires a single addition, `peras_cert`, the [block](#blocks) data on the ledger.
 
@@ -1353,7 +1405,6 @@ For example, the partner-chain use case might leverage Peras as follows.
 
 [^7]: Data extracted from https://support.kraken.com/hc/en-us/articles/203325283-Cryptocurrency-deposit-processing-times on 7 August 2024.
 
-
 ### Feasible values for Peras protocol parameters
 
 Based on the analyses in the [Peras Technical Report #2](https://peras.cardano-scaling.org/docs/reports/tech-report-2#defining-protocol-parameters-values), a reasonable set of default [protocol parameters](#protocol-parameters) for further study, simulation, and discussion is show in the table below. The optimal values for a real-life blockchain would depend somewhat upon external requirements such as balancing settlement time against resisting adversarial behavior at high values of adversarial stake. This set of parameters is focused on the use case of knowing soon whether a block is settled or rolled back; other sets of parameters would be optimal for use cases that reduce the probability of roll-back at the expense of waiting longer for settlement.
@@ -1367,8 +1418,8 @@ Based on the analyses in the [Peras Technical Report #2](https://peras.cardano-s
 | Certificate expiration | $A$              | rounds  |   300 | Determined by the Praos security parameter and boost.                |
 | Chain-ignorance period | $R$              | rounds  |   300 | Determined by the Praos security parameter, round length, and boost. |
 | Cool-down period       | $K$              | rounds  |   780 | Determined by the Praos security parameter, round length and boost.  |
-| Committee size         | $n$              | parties |   900 | 1 ppm probability of no honest quorum at 10% adversarial stake.      |
-| Quorum size            | $\tau$           | parties |   675 | Three-quarters of committee size.                                    |
+| Expected committee size         | $n$              | parties |   900 | 1 ppm probability of no honest quorum at 10% adversarial stake. (Depends on the sortition, and we might drop it because it does not make sense for all committie selection algorithms)     |
+| Quorum threshold            | $\tau$           | parties |   675 | Three-quarters of committee size.                                    |
 
 In pre-alpha Peras, there is a fundamental trade-off between low latency until a block can receive a boost (favoring a small $L$), and resilience against weak adversaries (<25% stake) trying to disable Peras by forcing into into a cooldown (favoring a high $L$). A *block-selection offset* of $L = 30 \text{\,slots}$ allows plenty of time for blocks to diffuse to voters before a vote occurs, but it provides only little resilience against weak attackers. Future iterations of Peras (involving pre-agreement) allow to resolve this trade-off (at the cost of additional complexity and network bandwidth overhead).
 
@@ -1376,10 +1427,25 @@ Combining this with a *round length* of $U = 90 \text{\, slots}$ ensures that th
 
 The Praos security parameter $k_\text{praos} = 2160 \text{\,blocks} \approx 43200 \text{\,slots} = 12 \text{\,hours}$ implies a ~17% probability of a longer private adversarial chain at 49% adversarial stake. At that same probability, having to overcome a $B = 15 \text{\,blocks}$ adversarial boost would require $k_\text{peras} \approx 70200 \text{\,slots} = 3510 \text{\,blocks} = 19.5 \text{\,hours}$. This determines the *certificate-expiration time* as $A = \left\lceil (k_\text{peras} - k_\text{praos}) / U \right\rceil = 300 \text{\,rounds}$, the *chain-ignorance period* as $R = A = 300 \text{\,rounds}$, and the *cool-down period* as $K = \left\lceil k_\text{peras} / U \right\rceil = 780 \text{\,rounds}$.
 
-The *committee size* of $n = 900 \text{\,parties}$ corresponds to a one in a million chance of not reaching a quorum if 10% of the parties do not vote for the majority block (either because they are adversarial, offline, didn't receive the block, or chose to vote for a block on a non-preferred fork). This "no quorum" probability is equivalent to one missed quorum in every 1.2 years. The *quorum size* of $\tau = \left\lceil 3 n / 4 \right\rceil = 675 \text{\,parties}$ is computed from this.
+#### Committee selection
+
+Peras is designed to support multiple committee-selection algorithms. The concrete selection mechanism is not fixed by the core Peras protocol, provided that it satisfies the security requirements of the voting and certificate scheme.
+The committee-selection mechanisms currently considered for Peras include **Weighted Fait-Accompli** (wFA) and **stake truncation**.
+
+**Weighted Fait-Accompli (wFA)** (see references) combines a set of persistent voters—stake-pool operators with sufficiently high stake that always participate—with a varying set of non-persistent voters selected randomly according to stake. This reduces the variance of adversarial representation in the committee and provides a better committee-size-versus-security trade-off than conventional independent sortition. For Peras, wFA is also being considered specifically as the basis of the certificate scheme, where its parameterization may favor a larger proportion of persistent voters in order to reduce certificate size.
+
+A wFA-based scheme is intended to provide adaptive security when combined with a key-evolving signature scheme and an adaptively secure fallback mechanism for non-persistent voters. It also preserves participation by smaller stake-pool operators, which retain a non-zero probability of being selected. The principal cost is larger votes and certificates, because non-persistent voters must include proofs of eligibility, such as VRF outputs.
+
+**Stake truncation** follows the approach proposed for Ouroboros Leios (CIP-0164). Stake-pool operators are ordered by decreasing stake, and operators below a configured cumulative-stake threshold are excluded from the voting committee. The current proposal uses a threshold covering 99% of the active stake, which under the current Cardano stake distribution corresponds to a committee of approximately 1000 SPOs. At this threshold, the committee is sufficiently large to make short-term adaptive attacks negligible for the security analysis, allowing the analysis to focus primarily on long-range attacks.
+
+These mechanisms make different trade-offs. wFA provides stronger support for adaptive security and representation of smaller stake-pool operators, at the cost of larger eligibility proofs and certificates. Truncation provides a simpler and more compact committee and certificate structure, but excludes the smallest stake-pool operators from participation.
+
+The Peras protocol therefore does not assume that committee selection is permanently tied to a single algorithm. The selected mechanism and its parameters form part of the voting and certificate design and may evolve independently of the core Peras consensus rules.
+
+<!-- The *committee size* of $n = 900 \text{\,parties}$ corresponds to a one in a million chance of not reaching a quorum if 10% of the parties do not vote for the majority block (either because they are adversarial, offline, didn't receive the block, or chose to vote for a block on a non-preferred fork). This "no quorum" probability is equivalent to one missed quorum in every 1.2 years. The *quorum size* of $\tau = \left\lceil 3 n / 4 \right\rceil = 675 \text{\,parties}$ is computed from this.
+-->
 
 At dashboard for computing the probabilistic implications of Peras protocol parameters is a available at https://peras.cardano-scaling.org/dashboard/.
-
 
 ### Attack and mitigation
 
@@ -1404,7 +1470,6 @@ Decentralized, stake-based block production and voting systems may be subject to
 Natural events or adversaries might interfere with the diffusion of votes over the network. Peras voting is not affected so long as the network diffuses at least the 75% threshold for reaching a quorum. One quarter of the votes could be lost, dishonest, or withheld. Furthermore, the Peras $L$ parameter ensures that there is plenty of time for honest blocks to diffuse and for them to be in a common prefix of the active forks before voting begins. The Peras $R$ parameter, the number of slots for which certificates (votes) are ignored once a cool-down period starts, guards against an adversary holding onto votes and then releasing them to try to revert an already-begun cool-down period.
 
 In no way does Peras weaken any of the security guarantees provided by Praos or Genesis. Under strongly adversarial conditions, where an adversary can trigger a Peras voting cool-down period, the protocol in essence reverts to the Praos (or Genesis) protocol, but for a duration somewhat longer than the Praos security parameter. Otherwise, settlement occurs at the blocks that Peras voting has boosted. The Peras protocol parameters can be tuned to adjust the settlement time or the non-settlement probabilities. Some stakeholder use cases might prefer shorter settlement times but with a higher probability of retries, or vice versa.
-
 
 ### Resource requirements
 
@@ -1494,9 +1559,9 @@ Thus, Peras should not have any significant impact on the memory requirements of
 
 ### Implementation plan
 
-- [ ] Detailed node-level (as opposed to this protocol-level) specification.
+- [x] Detailed node-level (as opposed to this protocol-level) specification. (TODO: Link to doc)
 - [ ] Develop node-level conformance test suite.
-- Consider developing a "quick and dirty" implementation for large scale experiments.
+- [ ] Consider developing a "quick and dirty" implementation for large scale experiments.
 - Coordinate with related activities on other protocol enhancements.
     - Compatibility between Peras, Leios, and Genesis.
     - Common design and implementation for certificates, voting, and related key registration: Mithril, Peras, Leios, and partner chains.
@@ -1535,6 +1600,7 @@ This machine-readable specification is pinned to [Agda 2.6.4.3](https://github.c
 - [Scaling blockchain protocols: a research-based approach](https://www.youtube.com/watch?v=Czmg9WmSCcI)
 - [Consensus Redux: Distributed Ledgers in the Face of Adversarial Supremacy](https://eprint.iacr.org/2020/1021.pdf)
 - [Practical Settlement Bounds for Longest-Chain Consensus](https://eprint.iacr.org/2022/1571.pdf)
+- [Fait Accompli Committee Selection: Improving the Size-Security Tradeoff of Stake-Based Committees](https://eprint.iacr.org/2023/1273)
 
 
 ## Appendix
