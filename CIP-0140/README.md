@@ -144,9 +144,9 @@ A [*fetching*](#fetching) operation occurs at the beginning of each slot:
 
     This requires diffusing certificates in cases where different honest nodes received different equivocating votes.
 - Set $C_\text{pref}$ to the heaviest (w.r.t. $\mathsf{Wt}\_\mathsf{P}(\cdot)$ ) valid chain in $\mathcal{C}$.
-  - Each party $\mathsf{P}$ assigns a certain weight to every chain $C$, based on $C$'s length and all certificates that vote for blocks in $C$ that $\mathsf{P}$ has seen so far (and thus stored in a local list $\mathsf{Certs}$).
+  - Each party $\mathsf{P}$ assigns a certain weight to every chain $C$, based on $C$'s length and all certificates that boosts blocks in $C$ that $\mathsf{P}$ has seen so far (and thus stored in a local list $\mathsf{Certs}$).
   - Each certificate contributes a boost equal to the value of the protocol parameter $B$ that was in effect when the certificate was forged. Therefore, the weight of a chain $C$ in $\mathsf{P}$'s view is its length plus the sum of the boosts associated with certificates that point to blocks on $C$:
-  $\mathsf{Wt}\_\mathsf{P}(C) := \mathsf{len}(C) + \sum_{c \in C}{\mathsf{Wt}(c)}$, where $\mathsf{Wt}(c)$.
+  $\mathsf{Wt}\_\mathsf{P}(C) := \mathsf{len}(C) + \sum_{c \in C}{\mathsf{Wt}(c)}$, where $\mathsf{Wt}(c)$ is a value of the protocol parameter $B$ at the time when certificate $c$ was forged.
 
 - Set $\mathsf{cert}^\prime$ to the certificate with the highest round number in $\mathsf{Certs}$.
 - Set $\mathsf{cert}^*$ to the certificate with the highest round number present in $C_\text{pref}$.
