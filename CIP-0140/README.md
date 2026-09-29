@@ -1227,7 +1227,7 @@ Not all parameters used by Peras need to be represented as governable ledger pro
 | ppPerasTargetCommitteeSize | $n$ | Word16 | The number of members on the voting committee. | 900 |
 | ppPerasBootstrapRound | $R_\mathsf{bootstrap}$ | StrictMaybe Word32 | Peras round number used to manually bootstrap. Peras voting for the first time and to resynchronize voting after unexpected failures. | Nothing |
 | ppPerasHealingFactor | $h$ | PositiveInterval | Coefficient used when deriving the healing period. | 2 |
-| ppPerasQuorumThresholdSafetyMargin | $\tau_\mathsf{margin}$ | PositiveInterval | Additional safety margin applied when deriving the quorum threshold. | 0.1 |
+| ppPerasQuorumThresholdSafetyMargin | $\tau_\mathsf{margin}$ | PositiveInterval | Additional safety margin applied on top of the the base 75% quorum threshold. | 0.1 |
 
 #### Dependencies between parameters
 
@@ -1261,14 +1261,15 @@ TODO: check what we actually have in the ledger
 Peras requires a single addition, `peras_cert`, the [block](#blocks) data on the ledger.
 
 ```diff
- block =
-   [ header
-   , transaction_bodies         : [* transaction_body]
-   , transaction_witness_sets   : [* transaction_witness_set]
-   , auxiliary_data_set         : {* transaction_index => auxiliary_data }
-   , invalid_transactions       : [* transaction_index ]
-+  , ? peras_cert               : votes_certificate
-   ]
+  block = [header, block_body]
+
+  block_body =
+    [ transactions      : [* block_transaction]
+    , leios_certificate : leios_certificate/ nil
++   , peras_certificate : peras_certificate/ nil
+    ]
+
+  peras_certificate = bytes
 ```
 
 [Votes](https://github.com/input-output-hk/peras-design/blob/main/analytics/certificates-jan2025.md) are serialized in the following CDDL.
@@ -1420,7 +1421,7 @@ Based on the analyses in the [Peras Technical Report #2](https://peras.cardano-s
 | Certificate expiration | $A$              | rounds  |   300 | Determined by the Praos security parameter and boost.                |
 | Chain-ignorance period | $R$              | rounds  |   300 | Determined by the Praos security parameter, round length, and boost. |
 | Cool-down period       | $K$              | rounds  |   780 | Determined by the Praos security parameter, round length and boost.  |
-| Expected committee size         | $n$              | parties |   900 | 1 ppm probability of no honest quorum at 10% adversarial stake. (Depends on the sortition, and we might drop it because it does not make sense for all committie selection algorithms)     |
+| Target committee size         | $n$              | parties |   900 | 1 ppm probability of no honest quorum at 10% adversarial stake. (Depends on the sortition, and we might drop it because it does not make sense for all committie selection algorithms)     |
 | Quorum threshold            | $\tau$           | parties |   675 | Three-quarters of committee size.                                    |
 
 In pre-alpha Peras, there is a fundamental trade-off between low latency until a block can receive a boost (favoring a small $L$), and resilience against weak adversaries (<25% stake) trying to disable Peras by forcing into into a cooldown (favoring a high $L$). A *block-selection offset* of $L = 30 \text{\,slots}$ allows plenty of time for blocks to diffuse to voters before a vote occurs, but it provides only little resilience against weak attackers. Future iterations of Peras (involving pre-agreement) allow to resolve this trade-off (at the cost of additional complexity and network bandwidth overhead).
@@ -1558,7 +1559,7 @@ Thus, Peras should not have any significant impact on the memory requirements of
 
 ### Implementation plan
 
-- [x] Detailed node-level (as opposed to this protocol-level) specification. (TODO: Link to doc)
+- [x] Detailed node-level (as opposed to this protocol-level) specification.
 - [ ] Develop node-level conformance test suite.
 - Consider developing a "quick and dirty" implementation for large scale experiments.
 - Coordinate with related activities on other protocol enhancements.
