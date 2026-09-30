@@ -1228,7 +1228,7 @@ Not all parameters used by Peras need to be represented as governable ledger pro
 | ppPerasMinCandidateBlockAge | $L$ | SlotInterval | The minimum age of a candidate block for being voted upon. | 30 |
 | ppPerasCertBoost | B | Word16 | The extra chain weight that a certificate gives to a block. | 15 |
 | ppPerasTargetCommitteeSize | $n$ | Word16 | The number of members on the voting committee. | 900 |
-| ppPerasBootstrapRound | $R_\mathsf{bootstrap}$ | StrictMaybe Word32 | Peras round number used to manually bootstrap. Peras voting for the first time and to resynchronize voting after unexpected failures. | Nothing |
+| ppPerasBootstrapRound | $R_\mathsf{bootstrap}$ | StrictMaybe Word32 | Peras round number used to manually bootstrap Peras voting for the first time and to resynchronize voting after unexpected failures. | Nothing |
 | ppPerasHealingFactor | $h$ | PositiveInterval | Coefficient used when deriving the healing period. | 2 |
 | ppPerasQuorumThresholdSafetyMargin | $\tau_\mathsf{margin}$ | PositiveInterval | Additional safety margin applied on top of the the base 75% quorum threshold. | 0.1 |
 
