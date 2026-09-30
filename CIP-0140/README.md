@@ -596,7 +596,7 @@ module _ ⦃ _ : Params ⦄ where
   ∥_∥_ : Chain → List Certificate → ℕ
     where
       certificateBoost : Block → Nat
-      certificateBoost block = foldr max 0 (map Certificate.weight (filter (λ cert → hash block == blockRef cert) cts))
+      certificateBoost block = sum (map Certificate.weight (filter (λ cert → hash block == blockRef cert) cts))
 
       chainWeight' : Nat → Chain → Nat
       chainWeight' accum [] = accum
