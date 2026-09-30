@@ -867,10 +867,10 @@ Voting is allowed in a round if voting has proceeded regularly in preceding roun
     VotingRule-1A (MkRoundNumber r) t =
       let cert = latestCertSeen t
       in r ≡ Certificate.roundNumber (latestCertSeen t) + 1
-           × SeenInCertificateRound U Δ cert (certSeenAt t cert)
+           × SeenInCertificateRound U Δ cert (arrivalSlotOfCert t cert)
 ```
 
-where `SeenInCertificateRound` means that the certificate was seen within the first $\Delta$ slots of round $r-1$
+where `SeenInCertificateRound U Δ` means that the certificate was seen within the first $\Delta$ slots of round $r-1$
 
 ```agda
 SeenInCertificateRound : Nat → Nat → Certificate → Maybe SlotNumber → Set
