@@ -145,7 +145,7 @@ A [*fetching*](#fetching) operation occurs at the beginning of each slot:
     This requires diffusing certificates in cases where different honest nodes received different equivocating votes.
 - Set $C_\text{pref}$ to the heaviest (w.r.t. $\mathsf{Wt}\_\mathsf{P}(\cdot)$ ) valid chain in $\mathcal{C}$.
   - Each party $\mathsf{P}$ assigns a certain weight to every chain $C$, based on $C$'s length and all certificates that boost blocks in $C$ that $\mathsf{P}$ has seen so far (and thus stored in a local list $\mathsf{Certs}$).
-  - Let $\mathsf{chainCert}_P(C)=\left\{\mathsf{cert} \in \mathsf{Certs} : \mathsf{cert} \text{ votes for a block on } C\right\}$ a set of all the certificates that voted for any block on the chain $C$
+  - Let $\mathsf{chainCert}_P(C)=\left\lbrace \mathsf{cert} \in \mathsf{Certs} \mid \mathsf{cert} \text{ votes for a block on } C \right\rbrace$ a set of all the certificates that voted for any block on the chain $C$
   - Each certificate contributes a boost equal to the value of the protocol parameter $B$ that was in effect when the certificate was forged. Therefore, the weight of a chain $C$ in $\mathsf{P}$'s view is its length plus the sum of the boosts associated with certificates that point to blocks on $C$: <br>
   $\mathsf{Wt}\_\mathsf{P}(C) := \mathsf{len}(C) + \sum_{\mathsf{c} \in \mathsf{chainCert}_\mathsf{P}(C)}\mathsf{Wt}(\mathsf{c})$,<br> where $\mathsf{Wt}(\mathsf{c})$ is a value of the protocol parameter $B$ at the time when certificate $\mathsf{c}$ was forged.
 
