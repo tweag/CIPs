@@ -144,7 +144,7 @@ A [*fetching*](#fetching) operation occurs at the beginning of each slot:
 
     This requires diffusing certificates in cases where different honest nodes received different equivocating votes.
 - Set $C_\text{pref}$ to the heaviest (w.r.t. $\mathsf{Wt}\_\mathsf{P}(\cdot)$ ) valid chain in $\mathcal{C}$.
-  - Each party $\mathsf{P}$ assigns a certain weight to every chain $C$, based on $C$'s length and all certificates that boosts blocks in $C$ that $\mathsf{P}$ has seen so far (and thus stored in a local list $\mathsf{Certs}$).
+  - Each party $\mathsf{P}$ assigns a certain weight to every chain $C$, based on $C$'s length and all certificates that boost blocks in $C$ that $\mathsf{P}$ has seen so far (and thus stored in a local list $\mathsf{Certs}$).
   - Each certificate contributes a boost equal to the value of the protocol parameter $B$ that was in effect when the certificate was forged. Therefore, the weight of a chain $C$ in $\mathsf{P}$'s view is its length plus the sum of the boosts associated with certificates that point to blocks on $C$:
   $\mathsf{Wt}\_\mathsf{P}(C) := \mathsf{len}(C) + \sum_{c \in C}{\mathsf{Wt}(c)}$, where $\mathsf{Wt}(c)$ is a value of the protocol parameter $B$ at the time when certificate $c$ was forged.
 
@@ -196,7 +196,7 @@ An [online simulator for Peras](https://peras-simulation.cardano-scaling.org/) i
 
 The following formal, relational specification for Peras type utilizes [Agda 2.6.4.3](https://github.com/agda/agda/tree/v2.6.4.3). See [the Appendix](#typechecking-this-specification) for instruction on type-checking this specification with the Agda compiler and see [github:input-output-hk/peras-design](https://github.com/input-output-hk/peras-design/) for proofs and other modules related to this specification.
 
-For simplicity, the Agda specification represents vote weights as natural numbers. The implementation uses rational-valued weights. The values come from a real stake distribution and normalized according to the committee selection scheme that is used.
+For simplicity, the Agda specification represents vote weights as natural numbers. The implementation uses rational-valued weights. The values come from the real stake distribution and normalized according to the committee selection scheme that is used.
 
 ```agda
 module README where
