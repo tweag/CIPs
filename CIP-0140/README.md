@@ -1210,7 +1210,7 @@ The structure of the Peras protocol imposes the following constraints on its [pa
 | Chain ignorance period  | $R$             | rounds  | The number of rounds for which to ignore certificates after entering a cool-down period.  | $R = A$                                                          | Ensure chain-ignorance period lasts long enough to include a certificate on the chain.    |
 | Cool-down period        | $K$             | rounds  | The minimum number of rounds to wait before voting again after a cool-down period starts. | $K = \left\lceil \frac{A + T_\text{CP}}{U} \right\rceil$         | After a quorum failure, the chain must heal, achieve quality, and attain a common prefix. |
 | Certification boost     | $B$             | blocks  | The extra chain weight that a certificate gives to a block.                               | $B > 0$                                                          | Peras requires that some blocks be boosted.                                               |
-| Quorum size             | $\tau$          | parties | The number of votes required to create a certificate.                                     | $\tau > 3 n / 4$                                                 | Guard against a minority (< 50%) of adversarial voters.                                   |
+| Quorum size             | $\tau$          | parties | The cumulative vote weight required to reach a quorum                                     | $\tau > 3 n / 4$                                                 | Guard against a minority (< 50%) of adversarial voters.                                   |
 | Committee size          | $n$             | parties | The number of members on the voting committee.                                            | $n > 0$                                                          | Peras requires a voting committee.                                                        |
 | Network diffusion time  | $\Delta$        | slots   | Upper limit on the time needed to diffuse a message to all nodes.                         | $\Delta > 0$                                                     | Messages have a finite delay.                                                             |
 | Active slot coefficient | $f$             | 1/slots | The probability that a party will be the slot leader for a particular slot.               | $0 < f \leq 1$                                                   | Blocks must be produced.                                                                  |
@@ -1424,8 +1424,8 @@ Based on the analyses in the [Peras Technical Report #2](https://peras.cardano-s
 | Certificate expiration | $A$              | rounds  |   300 | Determined by the Praos security parameter and boost.                |
 | Chain-ignorance period | $R$              | rounds  |   300 | Determined by the Praos security parameter, round length, and boost. |
 | Cool-down period       | $K$              | rounds  |   780 | Determined by the Praos security parameter, round length and boost.  |
-| Target committee size         | $n$              | parties |   900 | 1 ppm probability of no honest quorum at 10% adversarial stake. (Depends on the sortition, and we might drop it because it does not make sense for all committie selection algorithms)     |
-| Quorum threshold            | $\tau$           | parties |   675 | Three-quarters of committee size.                                    |
+| Target committee size         | $n$              | parties |   900 | 1 ppm probability of no honest quorum at 10% adversarial stake. (Depends on the sortition, and we might drop it because it does not make sense for all committee selection algorithms)     |
+| Quorum threshold            | $\tau$           | parties |   675 | Three-quarters of committee size. (Depends on the sortition, and we might drop it because it does not make sense for all committee selection algorithms)                                   |
 
 In pre-alpha Peras, there is a fundamental trade-off between low latency until a block can receive a boost (favoring a small $L$), and resilience against weak adversaries (<25% stake) trying to disable Peras by forcing into into a cooldown (favoring a high $L$). A *block-selection offset* of $L = 30 \text{\,slots}$ allows plenty of time for blocks to diffuse to voters before a vote occurs, but it provides only little resilience against weak attackers. Future iterations of Peras (involving pre-agreement) allow to resolve this trade-off (at the cost of additional complexity and network bandwidth overhead).
 
@@ -1440,7 +1440,7 @@ Possible alternatives include **Weighted Fait-Accompli** (wFA), **stake truncati
 
 **Weighted Fait-Accompli (wFA)** (see references) combines a set of persistent voters—stake-pool operators with sufficiently high stake that always participate—with a varying set of non-persistent voters selected randomly according to stake. This reduces the variance of adversarial representation in the committee and provides a better committee-size-versus-security trade-off than conventional independent sortition. For Peras, wFA is also being considered specifically as the basis of the certificate scheme, where its parameterization may favor a larger proportion of persistent voters in order to reduce certificate size.
 
-A wFA-based scheme provides adaptive security when combined with a key-evolving signature scheme and an adaptively secure fallback mechanism for non-persistent voters. It also preserves participation by smaller stake-pool operators, which retain a non-zero probability of being selected. The principal cost is larger votes and certificates, because non-persistent voters must include proofs of eligibility, such as VRF outputs.
+A wFA-based scheme provides adaptive security when a fallback mechanism for non-persistent voters does. It also preserves participation by smaller stake-pool operators, which retain a non-zero probability of being selected. The principal cost is larger votes and certificates, because non-persistent voters must include proofs of eligibility, such as VRF outputs.
 
 **Stake truncation** is the approach proposed for Ouroboros Leios (CIP-0164). Stake-pool operators are ordered by decreasing stake, and operators below a configured cumulative-stake threshold are excluded from the voting committee. As it stands, Leios proposal uses a threshold covering 99% of the active stake, which under the current Cardano stake distribution corresponds to a committee of approximately 1000 SPOs. At this threshold, the committee is sufficiently large to make short-term adaptive attacks negligible for the security analysis, allowing the analysis to focus primarily on long-range attacks.
 
@@ -1602,7 +1602,7 @@ This machine-readable specification is pinned to [Agda 2.6.4.3](https://github.c
 - [Online simulator for the Peras protocol](https://peras-simulation.cardano-scaling.org/)
 - [Scaling blockchain protocols: a research-based approach](https://www.youtube.com/watch?v=Czmg9WmSCcI)
 - [Consensus Redux: Distributed Ledgers in the Face of Adversarial Supremacy](https://eprint.iacr.org/2020/1021.pdf)
-- [Practical Settlement Bounds for Longest-Chain Consensus](https://eprint.iacr.org/2022/1571.pdf)
+- [Software repository for Peras design](https://github.com/input-output-hk/peras-design/)
 - [Fait Accompli Committee Selection: Improving the Size-Security Tradeoff of Stake-Based Committees](https://eprint.iacr.org/2023/1273)
 
 
