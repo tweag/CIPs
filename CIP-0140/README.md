@@ -866,7 +866,7 @@ Voting is allowed in a round if voting has proceeded regularly in preceding roun
     VotingRule-1A : RoundNumber → T → Set
     VotingRule-1A (MkRoundNumber r) t =
       r ≡ Certificate.roundNumber (latestCertSeen t) + 1
-        × SeenInCertificateRound U Δ cert (certSeenAt t cert)
+        × SeenInCertificateRound U Δ cert (latestCertSeen t)
 ```
 
 where `SeenInCertificateRound` means that the certificate was seen within the first $\Delta$ slots of round $r-1$
