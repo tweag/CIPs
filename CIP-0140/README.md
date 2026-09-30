@@ -1244,10 +1244,10 @@ Not all parameters used by Peras need to be represented as governable ledger pro
 
 ### Specification of votes and certificates
 
-The stake-proportional voting in Peras mimics the _sortition_ algorithm used in Praos: specifically it is based on the use of a *verifiable random function* (VRF) by each stake-pool operator guaranteeing the following properties:
+Voting is defined to expect the following properties:
 
 - The probability for each voter to cast their vote in a given round is correlated to their share of total stake.
-- It should be computationally impossible to predict a given SPO's schedule without access to their secret key VRF key.
+- It should be computationally impossible to predict a given SPO's schedule without access to their secret key VRF key (in case if VRF-based sortition is used)
 - Verification of a voter's right to vote in a round should be efficiently computable.
 - A vote should be unique and non-malleable, which is a requirement for the use of efficient certificates aggregation.
 
@@ -1256,7 +1256,20 @@ Additionally one would like the following property to be provided by the voting 
 - Voting should require minimal additional configuration (e.g., key management) for SPOs.
 - Voting and certificate construction should be fast in order to ensure it does not interfere with other operations happening in the node.
 
-The precise scheme and format for votes and certificates is immaterial to the protocol itself and is deferred to another proposed CIP [*Votes & Certificates on Cardano*](https://github.com/cardano-foundation/CIPs/pull/870) or to [the scheme documented in the Peras repository](https://github.com/input-output-hk/peras-design/blob/main/analytics/certificates-jan2025.md). Presumably, voting and certificates will be handled uniformly across Mithril, Peras, Leios, and partner chains.
+#### Committee selection
+
+The concrete committee-selection mechanism is not fixed by the core Peras protocol, but must satisfy the security requirements of the voting and certificate scheme.
+Possible alternatives include **Weighted Fait-Accompli** (wFA), **stake truncation** or even simply allowing all nodes with a positive stake to vote.
+
+**Weighted Fait-Accompli (wFA)** (see references) combines a set of persistent voters—stake-pool operators with sufficiently high stake that always participate—with a varying set of non-persistent voters selected randomly according to stake. This reduces the variance of adversarial representation in the committee and provides a better committee-size-versus-security trade-off than conventional independent sortition. For Peras, wFA is also being considered specifically as the basis of the certificate scheme, where its parameterization may favor a larger proportion of persistent voters in order to reduce certificate size.
+
+A wFA-based scheme provides adaptive security when a fallback mechanism for non-persistent voters does. It also preserves participation by smaller stake-pool operators, which retain a non-zero probability of being selected. The principal cost is larger votes and certificates, because non-persistent voters must include proofs of eligibility, such as VRF outputs. For more details refer to [the scheme documented in the Peras repository](https://github.com/input-output-hk/peras-design/blob/main/analytics/certificates-jan2025.md).
+
+**Stake truncation** is the approach proposed for Ouroboros Leios (CIP-0164). Stake-pool operators are ordered by decreasing stake, and operators below a configured cumulative-stake threshold are excluded from the voting committee. As it stands, Leios proposal uses a threshold covering 99% of the active stake, which under the current Cardano stake distribution corresponds to a committee of approximately 1000 SPOs. At this threshold, the committee is sufficiently large to make short-term adaptive attacks negligible for the security analysis, allowing the analysis to focus primarily on long-range attacks.
+
+These mechanisms make different trade-offs. wFA provides stronger support for adaptive security and representation of smaller stake-pool operators, at the cost of larger eligibility proofs and certificates. Truncation provides a simpler and more compact committee and certificate structure, but excludes the smallest stake-pool operators from participation.
+
+As the Peras protocol does not require committee selection to be tied to a single algorithm, the selected mechanism and its parameters form part of the voting and certificate design and may evolve independently of the core Peras consensus rules.
 
 ### CDDL schema for the ledger
 
@@ -1434,20 +1447,6 @@ Combining this with a *round length* of $U = 90 \text{\, slots}$ ensures that th
 
 The Praos security parameter $k_\text{praos} = 2160 \text{\,blocks} \approx 43200 \text{\,slots} = 12 \text{\,hours}$ implies a ~17% probability of a longer private adversarial chain at 49% adversarial stake. At that same probability, having to overcome a $B = 15 \text{\,blocks}$ adversarial boost would require $k_\text{peras} \approx 70200 \text{\,slots} = 3510 \text{\,blocks} = 19.5 \text{\,hours}$. This determines the *certificate-expiration time* as $A = \left\lceil (k_\text{peras} - k_\text{praos}) / U \right\rceil = 300 \text{\,rounds}$, the *chain-ignorance period* as $R = A = 300 \text{\,rounds}$, and the *cool-down period* as $K = \left\lceil k_\text{peras} / U \right\rceil = 780 \text{\,rounds}$.
 
-#### Committee selection
-
-The concrete committee-selection mechanism is not fixed by the core Peras protocol, but must satisfy the security requirements of the voting and certificate scheme.
-Possible alternatives include **Weighted Fait-Accompli** (wFA), **stake truncation** or even simply allowing all nodes with a positive stake to vote.
-
-**Weighted Fait-Accompli (wFA)** (see references) combines a set of persistent voters—stake-pool operators with sufficiently high stake that always participate—with a varying set of non-persistent voters selected randomly according to stake. This reduces the variance of adversarial representation in the committee and provides a better committee-size-versus-security trade-off than conventional independent sortition. For Peras, wFA is also being considered specifically as the basis of the certificate scheme, where its parameterization may favor a larger proportion of persistent voters in order to reduce certificate size.
-
-A wFA-based scheme provides adaptive security when a fallback mechanism for non-persistent voters does. It also preserves participation by smaller stake-pool operators, which retain a non-zero probability of being selected. The principal cost is larger votes and certificates, because non-persistent voters must include proofs of eligibility, such as VRF outputs.
-
-**Stake truncation** is the approach proposed for Ouroboros Leios (CIP-0164). Stake-pool operators are ordered by decreasing stake, and operators below a configured cumulative-stake threshold are excluded from the voting committee. As it stands, Leios proposal uses a threshold covering 99% of the active stake, which under the current Cardano stake distribution corresponds to a committee of approximately 1000 SPOs. At this threshold, the committee is sufficiently large to make short-term adaptive attacks negligible for the security analysis, allowing the analysis to focus primarily on long-range attacks.
-
-These mechanisms make different trade-offs. wFA provides stronger support for adaptive security and representation of smaller stake-pool operators, at the cost of larger eligibility proofs and certificates. Truncation provides a simpler and more compact committee and certificate structure, but excludes the smallest stake-pool operators from participation.
-
-As the Peras protocol does not require committee selection to be tied to a single algorithm, the selected mechanism and its parameters form part of the voting and certificate design and may evolve independently of the core Peras consensus rules.
 
 At dashboard for computing the probabilistic implications of Peras protocol parameters is a available at https://peras.cardano-scaling.org/dashboard/ and https://tweag.github.io/cardano-peras/dashboard/ .
 
