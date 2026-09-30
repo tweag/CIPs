@@ -1239,7 +1239,8 @@ Not all parameters used by Peras need to be represented as governable ledger pro
 | $T_\text{CQ}$ | $T_{CQ} = k / f$ |
 | $T_\mathsf{heal}$ | $T_\mathsf{heal} =  k ( B / f)$ |
 | $\tau_\mathsf{base} | $\tau_\mathsf{base} = 0.75$ |
-| $K$ | $K = \left\lceil \frac{A + T_\text{CP}}{U}$ |
+| $\tau$ | $\tau_0 = \left(\tau_\mathsf{base} + \tau_\mathsf{base}\right) \cdot \mathsf{totalExpectedVoteWeight}$ for real values $\tau=\tau_0$ for integer $\tau=\lceil \tau_0 \rceil$ |
+| $K$ | $K = \left\lceil \frac{A + T_\text{CP}}{U}\right\rceil$ |
 
 ### Specification of votes and certificates
 
